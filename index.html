@@ -3,151 +3,190 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marvel İzleme Rehberi — MCU İlerleme Takibi</title>
+  <title>Marvel İzleme Rehberi — MCU Takip & Bulut Senkronizasyon</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            obsidian: '#09090b',
-            card: '#18181b',
-            cardHover: '#202024',
-            crimson: '#e11d48',
-          }
-        }
-      }
-    };
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --marvel-red: #e62429;
+      --marvel-red-dark: #b81418;
+      --bg-base: #09090b;
+      --bg-card: #121216;
+      --bg-elevated: #18181d;
+    }
     body {
-      background-color: #09090b;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-base);
       color: #f4f4f5;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(230, 36, 41, 0.14), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(230, 36, 41, 0.08), transparent 30%);
     }
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    .font-display {
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.03em;
     }
-    ::-webkit-scrollbar-track {
-      background: #09090b;
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #e62429; }
+    .card-watched {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.09) 0%, rgba(18, 18, 22, 0.96) 100%);
+      border-color: rgba(16, 185, 129, 0.28);
     }
-    ::-webkit-scrollbar-thumb {
-      background: #27272a;
-      border-radius: 9999px;
+    .card-watching {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.11) 0%, rgba(18, 18, 22, 0.96) 100%);
+      border-color: rgba(245, 158, 11, 0.35);
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #3f3f46;
+    .card-unwatched {
+      background-color: #121216;
+      border-color: #27272a;
     }
   </style>
 </head>
-<body class="min-h-screen bg-[#09090b] text-zinc-100 antialiased selection:bg-rose-600 selection:text-white">
+<body class="min-h-screen antialiased selection:bg-[#e62429] selection:text-white">
 
-  <!-- Top Navigation & Hero Banner -->
-  <header class="relative border-b border-zinc-800/80 bg-gradient-to-b from-rose-950/25 via-[#09090b] to-[#09090b]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-8">
-      <!-- Top Brand Bar -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div class="flex items-center gap-3.5">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-rose-600 to-red-800 flex items-center justify-center shadow-lg shadow-rose-950/60 border border-rose-400/30 shrink-0">
-            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L4 5.5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5.5L12 2z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 7l1.45 2.95 3.25.47-2.35 2.29.55 3.24L12 14.42l-2.9 1.53.55-3.24-2.35-2.29 3.25-.47L12 7z" />
-            </svg>
+  <!-- ÜST BAŞLIK VE ÖZET PANELİ -->
+  <header class="sticky top-0 z-30 border-b border-zinc-800/90 bg-zinc-950/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3.5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Marka -->
+        <div class="flex items-center gap-3">
+          <div class="px-2.5 py-1 bg-[#e62429] text-white font-display font-bold text-xl tracking-wider uppercase rounded shadow-lg shadow-red-950/50 select-none">
+            MCU
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Marvel İzleme Rehberi</h1>
-              <span class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
-                MCU Takip Sistemi
-              </span>
-            </div>
-            <p class="text-xs sm:text-sm text-zinc-400 mt-0.5">Filmler, diziler, kısa yapımlar ve animasyonlar için kişisel izleme listeniz</p>
+            <h1 class="font-display text-lg sm:text-xl font-bold tracking-wide text-white uppercase leading-tight">
+              Marvel İzleme Rehberi
+            </h1>
+            <p class="text-[11px] text-zinc-400">87 Yapım • Kronolojik / Yayın İlerleme Takibi</p>
           </div>
         </div>
 
-        <!-- Utility Buttons (JSON Export / Import / Reset) -->
+        <!-- Bulut & Veri Araçları -->
         <div class="flex flex-wrap items-center gap-2">
-          <button id="btnExport" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition cursor-pointer">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            JSON Dışa Aktar
+          <button id="btnCloudModal" onclick="openCloudModal()"
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-200">
+            <span id="cloudDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+            <span id="cloudBtnText">GitHub Bulut Ayarı</span>
           </button>
-          <label for="fileImport" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition cursor-pointer">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            JSON İçe Aktar
-            <input id="fileImport" type="file" accept=".json,application/json" class="hidden" />
+
+          <button id="btnSyncNow" onclick="manualSyncNow()" title="GitHub ile Şimdi Eşitle"
+            class="hidden inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 transition cursor-pointer">
+            <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Eşitle</span>
+          </button>
+
+          <button onclick="exportJSON()" title="JSON Yedek İndir"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition cursor-pointer">
+            Dışa Aktar
+          </button>
+
+          <label title="JSON Yedek Yükle"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition cursor-pointer">
+            İçe Aktar
+            <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
           </label>
-          <button id="btnResetOpen" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border border-rose-800/50 transition cursor-pointer">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Tümünü Sıfırla
+
+          <button onclick="resetAllProgress()" title="Tüm İlerlemeyi Sıfırla"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-red-950/60 border border-zinc-800 hover:border-red-800/60 text-zinc-400 hover:text-red-300 transition cursor-pointer">
+            Sıfırla
           </button>
         </div>
       </div>
 
-      <!-- Main Progress Dashboard + Up Next Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <!-- Left: Global Stats & Progress Bar -->
-        <div class="lg:col-span-7 bg-[#18181b] border border-zinc-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Genel İzleme İlerlemesi</span>
-              <span id="progressPercentage" class="text-xl sm:text-2xl font-extrabold text-white">%0</span>
-            </div>
-
-            <p id="statsSummaryText" class="text-sm sm:text-base font-medium text-zinc-200 mb-4">
-              87 yapım | 0 izlendi | 0 izleniyor | 87 izlenmedi
-            </p>
-
-            <div class="w-full h-3.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 p-0.5">
-              <div id="globalProgressBar" class="h-full rounded-full bg-gradient-to-r from-rose-600 via-amber-500 to-emerald-500 transition-all duration-500 ease-out" style="width: 0%;"></div>
-            </div>
+      <!-- İlerleme Özeti & Progress Bar -->
+      <div class="mt-3 pt-3 border-t border-zinc-800/80">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs mb-1.5">
+          <div id="statsSummaryText" class="font-medium text-zinc-300">
+            87 yapım | 0 izlendi | 0 izleniyor | 87 izlenmedi
           </div>
-
-          <div class="flex flex-wrap items-center gap-3 mt-4 pt-3 border-t border-zinc-800/80 text-xs text-zinc-400">
-            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> İzlenmedi: <strong id="countUnwatched" class="text-zinc-200">87</strong></span>
-            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> İzleniyor: <strong id="countWatching" class="text-zinc-200">0</strong></span>
-            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> İzlendi: <strong id="countWatched" class="text-zinc-200">0</strong></span>
+          <div class="flex items-center gap-3">
+            <span id="cloudStatusLabel" class="text-[11px] text-zinc-500">Yerel kayıt aktif</span>
+            <span id="progressPercentText" class="font-bold text-sm text-[#e62429]">%0</span>
           </div>
         </div>
-
-        <!-- Right: Up Next / Continue Watching Card -->
-        <div id="upNextCard" class="lg:col-span-5 bg-gradient-to-br from-zinc-900 via-[#18181b] to-rose-950/20 border border-rose-500/30 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+        <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+          <div id="mainProgressBar" class="h-full bg-gradient-to-r from-[#e62429] to-red-500 transition-all duration-300" style="width: 0%"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Sticky Filter & Search Toolbar -->
-  <section class="sticky top-0 z-30 bg-[#09090b]/95 backdrop-blur-md border-b border-zinc-800/80">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 space-y-3">
-      <div class="flex flex-col md:flex-row gap-2.5">
-        <div class="relative flex-1">
-          <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- SIRADAKİ YAPIM KARTI -->
+    <section id="upNextSection" class="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-red-950/20 p-4 sm:p-5 shadow-xl">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <img id="upNextPoster" src="" alt="Sıradaki Yapım" class="w-16 h-24 rounded-lg object-cover border border-zinc-700 bg-zinc-950 shrink-0 shadow-md" />
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#e62429]/20 border border-[#e62429]/40 text-[#ff4d52] text-[11px] font-bold uppercase tracking-wider mb-1">
+              <span>▶ Sıradaki Yapım</span>
+            </div>
+            <h2 id="upNextTitle" class="text-lg sm:text-xl font-bold text-white leading-snug">01 — Iron Man</h2>
+            <p id="upNextMeta" class="text-xs text-zinc-400 mt-0.5">🎬 Film • 2008 • Infinity Saga – Phase 1 • ★ 7.9 IMDb</p>
+            <p id="upNextDesc" class="text-xs text-zinc-300 mt-1.5 line-clamp-2 max-w-2xl"></p>
+          </div>
+        </div>
+        <div class="flex flex-wrap sm:flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto shrink-0">
+          <button id="btnContinueWatching" onclick="scrollToUpNext()"
+            class="px-4 py-2 rounded-xl bg-[#e62429] hover:bg-[#b81418] text-white text-xs font-bold tracking-wide transition shadow-lg shadow-red-950/40 cursor-pointer">
+            İzlemeye Devam Et
+          </button>
+          <button id="btnMarkUpNextWatched" onclick="markUpNextAsWatched()"
+            class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-emerald-600/20 border border-zinc-700 hover:border-emerald-500/50 text-zinc-200 hover:text-emerald-300 text-xs font-semibold transition cursor-pointer">
+            🟢 İzlendi İşaretle
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FİLTRE VE ARAMA ÇUBUĞU -->
+    <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <!-- Arama -->
+        <div class="md:col-span-5 relative">
+          <input type="text" id="searchInput" oninput="applyFilters()"
+            placeholder="Film, dizi veya karakter ara (örn. Iron Man, Loki, Daredevil)..."
+            class="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-white placeholder-zinc-500" />
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input id="searchInput" type="text" placeholder="Yapım adı veya orijinal ad ara (örn. Iron Man, Loki, Daredevil)..." class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition" />
-          <button id="clearSearchBtn" type="button" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs p-1 cursor-pointer" title="Aramayı temizle">✕</button>
         </div>
 
-        <div class="grid grid-cols-2 sm:flex items-center gap-2.5">
-          <select id="typeFilter" aria-label="Yapım Türü Filtresi" class="px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:border-rose-500 cursor-pointer">
-            <option value="ALL">Tüm Türler</option>
-            <option value="Film">🎬 Filmler</option>
-            <option value="Dizi">📺 Diziler</option>
-            <option value="Özel Yapım">✨ Özel Yapımlar</option>
-            <option value="Animasyon">🎨 Animasyonlar</option>
+        <!-- Durum Filtresi -->
+        <div class="md:col-span-3">
+          <select id="statusFilter" onchange="applyFilters()"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
+            <option value="all">Durum: Tümü</option>
+            <option value="unwatched">🔴 Sadece İzlenmeyenler</option>
+            <option value="watching">🟡 İzleniyor</option>
+            <option value="watched">🟢 İzlendi</option>
           </select>
+        </div>
 
-          <select id="phaseFilter" aria-label="Dönem Filtresi" class="px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:border-rose-500 cursor-pointer">
-            <option value="ALL">Tüm Dönemler</option>
+        <!-- Tür Filtresi -->
+        <div class="md:col-span-2">
+          <select id="typeFilter" onchange="applyFilters()"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
+            <option value="all">Tür: Tümü</option>
+            <option value="Film">Filmler</option>
+            <option value="Dizi">Diziler</option>
+            <option value="Özel Yapım">Özel Yapımlar</option>
+            <option value="Animasyon">Animasyonlar</option>
+          </select>
+        </div>
+
+        <!-- Dönem Filtresi -->
+        <div class="md:col-span-2">
+          <select id="phaseFilter" onchange="applyFilters()"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
+            <option value="all">Dönem: Tümü</option>
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 2">Phase 2</option>
             <option value="Phase 3">Phase 3</option>
@@ -155,953 +194,880 @@
             <option value="Phase 4">Phase 4</option>
             <option value="Phase 5">Phase 5</option>
             <option value="Phase 6">Phase 6</option>
+            <option value="Gelecek Avengers">Gelecek Avengers</option>
           </select>
+        </div>
+      </div>
 
-          <button id="toggleAllAccordionsBtn" type="button" class="col-span-2 sm:col-span-1 px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 transition whitespace-nowrap cursor-pointer">
-            Tümünü Kapat
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400 pt-1">
+        <div id="filterResultInfo">Toplam 87 yapım listeleniyor</div>
+        <div class="flex items-center gap-3">
+          <button onclick="expandAllSections(true)" class="hover:text-white transition cursor-pointer">Tüm Bölümleri Aç</button>
+          <span>•</span>
+          <button onclick="expandAllSections(false)" class="hover:text-white transition cursor-pointer">Tümünü Daralt</button>
+          <span>•</span>
+          <button onclick="clearFilters()" class="text-[#e62429] hover:underline cursor-pointer">Filtreleri Temizle</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- BÖLÜMLERE AYRILMIŞ YAPIM LİSTESİ -->
+    <div id="sectionsContainer" class="space-y-4"></div>
+
+  </main>
+
+  <!-- GITHUB BULUT AYARI MODALI -->
+  <div id="cloudModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white">GitHub Bulut Senkronizasyonu</h3>
+          <p class="text-xs text-zinc-400">Deponuzdaki <code class="text-zinc-200">progress.json</code> dosyasına otomatik kayıt</p>
+        </div>
+        <button onclick="closeCloudModal()" class="text-zinc-400 hover:text-white text-lg px-2 cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-zinc-300 font-medium mb-1">GitHub Kullanıcı Adı</label>
+          <input type="text" id="ghOwner" placeholder="örnek: kullaniciadiniz"
+            class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-300 font-medium mb-1">Depo (Repository) Adı</label>
+            <input type="text" id="ghRepo" placeholder="örnek: mcu-tracker"
+              class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-zinc-300 font-medium mb-1">Dosya Yolu</label>
+            <input type="text" id="ghPath" value="progress.json"
+              class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-zinc-300 font-medium mb-1">Fine-Grained Personal Access Token</label>
+          <input type="password" id="ghToken" placeholder="github_pat_..."
+            class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
+          <p class="text-[11px] text-zinc-500 mt-1">
+            Sadece bu depo için <strong>Contents: Read and write</strong> yetkisi verilmiş token girin. Token yalnızca bu cihazın tarayıcısında saklanır.
+          </p>
+        </div>
+      </div>
+
+      <div id="cloudModalMsg" class="hidden text-xs p-2.5 rounded-lg border"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800">
+        <button onclick="disconnectCloud()" class="px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-red-400 transition cursor-pointer">
+          Bağlantıyı Kes
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeCloudModal()" class="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium cursor-pointer">
+            İptal
+          </button>
+          <button onclick="saveAndTestCloudConfig()" class="px-4 py-2 rounded-lg bg-[#e62429] hover:bg-[#b81418] text-white text-xs font-bold cursor-pointer">
+            Bağlan & Kaydet
           </button>
         </div>
       </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div id="statusFilterGroup" class="flex flex-wrap items-center gap-1.5">
-          <button data-status="ALL" class="status-pill active px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 text-white transition cursor-pointer">Tümü</button>
-          <button data-status="unwatched" class="status-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition cursor-pointer">🔴 İzlenmedi</button>
-          <button data-status="watching" class="status-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition cursor-pointer">🟡 İzleniyor</button>
-          <button data-status="watched" class="status-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition cursor-pointer">🟢 İzlendi</button>
-        </div>
-
-        <div id="filterResultInfo" class="text-xs text-zinc-400">
-          87 yapım gösteriliyor
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Content: 8 Saga/Phase Accordion Sections -->
-  <main id="sectionsContainer" class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-    <div class="text-center py-12 text-zinc-400 text-sm">Liste yükleniyor...</div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="max-w-6xl mx-auto px-4 sm:px-6 py-8 mt-6 border-t border-zinc-900 text-center text-xs text-zinc-500">
-    <p>Marvel İzleme Rehberi • Tüm ilerlemeniz tarayıcınızda yerel olarak saklanır ve çevrimdışı çalışır.</p>
-  </footer>
-
-  <!-- Poster Lightbox & Detail Modal -->
-  <div id="posterModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
-    <div id="posterModalContent" class="bg-[#18181b] border border-zinc-800 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
     </div>
   </div>
 
-  <!-- Custom Reset Confirmation Modal -->
-  <div id="resetModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="bg-[#18181b] border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        </div>
-        <h3 class="text-lg font-bold text-white">İlerlemeyi Sıfırla</h3>
-      </div>
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        Tüm 87 Marvel yapımının izleme durumunu <strong class="text-zinc-200">"İzlenmedi"</strong> olarak sıfırlamak istediğinize emin misiniz? Bu işlem geri alınamaz (öncesinde JSON dışa aktarabilirsiniz).
-      </p>
-      <div class="flex items-center justify-end gap-2.5">
-        <button id="btnResetCancel" type="button" class="px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition cursor-pointer">Vazgeç</button>
-        <button id="btnResetConfirm" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-white transition cursor-pointer">Evet, Sıfırla</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification Banner -->
-  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white shadow-2xl transition-all">
-    <span id="toastIcon">✅</span>
-    <span id="toastMessage">İşlem tamamlandı.</span>
-  </div>
+  <!-- TOAST BİLDİRİM -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-medium text-white shadow-2xl"></div>
 
   <script>
-    const SAGA_SECTIONS = [
+    // =========================================================================
+    // 1. 87 MADDELİK EKSİKSİZ MARVEL SİNEMATİK EVRENİ (MCU) VERİ SETİ
+    // =========================================================================
+    const MCU_ITEMS = [
+      // BÖLÜM 1: Infinity Saga – Phase 1
+      { id: 1, sira: 1, ad: "Iron Man", orijinal_ad: "Iron Man", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "7.9", imdb_id: "tt0371746", aciklama: "Tony Stark'ın zırhını inşa edip MCU evrenini başlattığı ilk film." },
+      { id: 2, sira: 2, ad: "The Incredible Hulk", orijinal_ad: "The Incredible Hulk", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.6", imdb_id: "tt0800080", aciklama: "Bruce Banner'ın gama radyasyonu sonrası Hulk'a dönüşüm mücadelesi." },
+      { id: 3, sira: 3, ad: "Iron Man 2", orijinal_ad: "Iron Man 2", yil: 2010, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.9", imdb_id: "tt1228705", aciklama: "Tony Stark, Ivan Vanko ve Black Widow'un ilk kez sahneye çıkışı." },
+      { id: 4, sira: 4, ad: "Marvel One-Shot: The Consultant", orijinal_ad: "Marvel One-Shot: The Consultant", yil: 2011, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.5", imdb_id: "tt2011118", aciklama: "Ajan Coulson ve Sitwell'in Abomination planını konu alan kısa film." },
+      { id: 5, sira: 5, ad: "Thor", orijinal_ad: "Thor", yil: 2011, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "7.0", imdb_id: "tt0800369", aciklama: "Asgard'dan Dünya'ya sürgün edilen Thor ve Loki'nin taht mücadelesi." },
+      { id: 6, sira: 6, ad: "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer", orijinal_ad: "A Funny Thing Happened on the Way to Thor's Hammer", yil: 2011, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "7.2", imdb_id: "tt2011109", aciklama: "Ajan Coulson'ın New Mexico yolundaki benzinlik macerası." },
+      { id: 7, sira: 7, ad: "Captain America: İlk Yenilmez", orijinal_ad: "Captain America: The First Avenger", yil: 2011, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.9", imdb_id: "tt0458339", aciklama: "Steve Rogers'ın süper asker serumuyla Hydra'ya karşı savaşı." },
+      { id: 8, sira: 8, ad: "Marvel One-Shot: Agent Carter", orijinal_ad: "Marvel One-Shot: Agent Carter", yil: 2013, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "7.5", imdb_id: "tt3067038", aciklama: "Peggy Carter'ın savaş sonrası gizli Zodiac operasyonu." },
+      { id: 9, sira: 9, ad: "The Avengers (Yenilmezler)", orijinal_ad: "The Avengers", yil: 2012, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "8.0", imdb_id: "tt0848228", aciklama: "Loki ve Chitauri istilasına karşı ilk büyük Avengers birleşmesi." },
+      { id: 10, sira: 10, ad: "Marvel One-Shot: Item 47", orijinal_ad: "Marvel One-Shot: Item 47", yil: 2012, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.7", imdb_id: "tt2247732", aciklama: "New York savaşı sonrası Chitauri silahı bulan bir çiftin hikayesi." },
+
+      // BÖLÜM 2: Infinity Saga – Phase 2
+      { id: 11, sira: 11, ad: "Iron Man 3", orijinal_ad: "Iron Man 3", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.1", imdb_id: "tt1300854", aciklama: "New York travması yaşayan Tony Stark'ın Mandarin ile yüzleşmesi." },
+      { id: 12, sira: 12, ad: "Marvel One-Shot: All Hail the King", orijinal_ad: "Marvel One-Shot: All Hail the King", yil: 2014, tur: "Özel Yapım", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.3", imdb_id: "tt3438640", aciklama: "Hapishanedeki Trevor Slattery ile yapılan gizemli röportaj." },
+      { id: 13, sira: 13, ad: "Thor: Karanlık Dünya", orijinal_ad: "Thor: The Dark World", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "6.7", imdb_id: "tt1981115", aciklama: "Kara Elfler, Malekith ve Gerçeklik Taşı (Aether) tehdidi." },
+      { id: 14, sira: 14, ad: "Captain America: Kış Askeri", orijinal_ad: "Captain America: The Winter Soldier", yil: 2014, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.7", imdb_id: "tt1843866", aciklama: "S.H.I.E.L.D. içindeki Hydra sızıntısı ve Bucky Barnes'ın dönüşü." },
+      { id: 15, sira: 15, ad: "Galaksinin Koruyucuları", orijinal_ad: "Guardians of the Galaxy", yil: 2014, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "8.0", imdb_id: "tt2015381", aciklama: "Star-Lord ve ekibinin Güç Taşı'nı Ronan'dan koruma macerası." },
+      { id: 16, sira: 16, ad: "Galaksinin Koruyucuları 2", orijinal_ad: "Guardians of the Galaxy Vol. 2", yil: 2017, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.6", imdb_id: "tt3896198", aciklama: "Peter Quill'in babası Ego ile karşılaşması ve kozmik aile bağları." },
+      { id: 17, sira: 17, ad: "I Am Groot (1. Sezon)", orijinal_ad: "I Am Groot Season 1", yil: 2022, tur: "Animasyon", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "6.7", imdb_id: "tt13623148", aciklama: "Bebek Groot'un galaksideki eğlenceli kısa maceraları." },
+      { id: 18, sira: 18, ad: "Agent Carter (1. Sezon)", orijinal_ad: "Agent Carter Season 1", yil: 2015, tur: "Dizi", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.8", imdb_id: "tt3475734", aciklama: "Peggy Carter'ın SSR ajanı olarak Howard Stark'ı aklama çabası." },
+      { id: 19, sira: 19, ad: "Agent Carter (2. Sezon)", orijinal_ad: "Agent Carter Season 2", yil: 2016, tur: "Dizi", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.8", imdb_id: "tt3475734", aciklama: "Peggy Carter'ın Los Angeles'taki Zero Matter gizemi." },
+      { id: 20, sira: 20, ad: "Avengers: Ultron Çağı", orijinal_ad: "Avengers: Age of Ultron", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.3", imdb_id: "tt2395427", aciklama: "Ultron'un doğuşu, Sokovia savaşı ve Vision'ın ekibe katılışı." },
+      { id: 21, sira: 21, ad: "Ant-Man", orijinal_ad: "Ant-Man", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.2", imdb_id: "tt0478970", aciklama: "Scott Lang'in Hank Pym'den küçülme teknolojisini devralması." },
+
+      // BÖLÜM 3: Defenders Saga
+      { id: 22, sira: 22, ad: "Daredevil (1. Sezon)", orijinal_ad: "Daredevil Season 1", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.6", imdb_id: "tt3322312", aciklama: "Matt Murdock'un Hell's Kitchen'da Wilson Fisk'e karşı savaşı." },
+      { id: 23, sira: 23, ad: "Jessica Jones (1. Sezon)", orijinal_ad: "Jessica Jones Season 1", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.9", imdb_id: "tt2357547", aciklama: "Özel dedektif Jessica Jones'un zihin kontrolcüsü Kilgrave ile hesabı." },
+      { id: 24, sira: 24, ad: "Daredevil (2. Sezon)", orijinal_ad: "Daredevil Season 2", yil: 2016, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.6", imdb_id: "tt3322312", aciklama: "Punisher ve Elektra'nın Hell's Kitchen sahnesine girişi." },
+      { id: 25, sira: 25, ad: "Luke Cage (1. Sezon)", orijinal_ad: "Luke Cage Season 1", yil: 2016, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.2", imdb_id: "tt3322314", aciklama: "Kurşun geçirmez deriye sahip Luke Cage'in Harlem'i koruması." },
+      { id: 26, sira: 26, ad: "Iron Fist (1. Sezon)", orijinal_ad: "Iron Fist Season 1", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "6.4", imdb_id: "tt3322310", aciklama: "Danny Rand'in K'un-Lun'dan New York'a dönüşü ve El örgütü." },
+      { id: 27, sira: 27, ad: "The Defenders", orijinal_ad: "The Defenders", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.2", imdb_id: "tt4230076", aciklama: "Daredevil, Jessica Jones, Luke Cage ve Iron Fist'in ortak ittifakı." },
+      { id: 28, sira: 28, ad: "The Punisher (1. Sezon)", orijinal_ad: "The Punisher Season 1", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.4", imdb_id: "tt5675620", aciklama: "Frank Castle'ın ailesinin ölümünün ardındaki komployu çözmesi." },
+      { id: 29, sira: 29, ad: "Jessica Jones (2. Sezon)", orijinal_ad: "Jessica Jones Season 2", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.8", imdb_id: "tt2357547", aciklama: "Jessica'nın güçlerinin kaynağını ve geçmişini araştırması." },
+      { id: 30, sira: 30, ad: "Luke Cage (2. Sezon)", orijinal_ad: "Luke Cage Season 2", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.2", imdb_id: "tt3322314", aciklama: "Harlem'in yeni tehdidi Bushmaster ve Mariah Dillard çatışması." },
+      { id: 31, sira: 31, ad: "Iron Fist (2. Sezon)", orijinal_ad: "Iron Fist Season 2", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "6.5", imdb_id: "tt3322310", aciklama: "Danny Rand ve Davos arasındaki Demir Yumruk mücadelesi." },
+      { id: 32, sira: 32, ad: "Daredevil (3. Sezon)", orijinal_ad: "Daredevil Season 3", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.7", imdb_id: "tt3322312", aciklama: "Özgür kalan Kingpin ve sahte Daredevil (Bullseye) krizi." },
+      { id: 33, sira: 33, ad: "The Punisher (2. Sezon)", orijinal_ad: "The Punisher Season 2", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.4", imdb_id: "tt5675620", aciklama: "Frank Castle'ın genç bir kızı korurken Billy Russo ile yüzleşmesi." },
+      { id: 34, sira: 34, ad: "Jessica Jones (3. Sezon)", orijinal_ad: "Jessica Jones Season 3", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.8", imdb_id: "tt2357547", aciklama: "Jessica ve Trish Walker'ın zeki bir seri katille mücadelesi." },
+
+      // BÖLÜM 4: Infinity Saga – Phase 3
+      { id: 35, sira: 35, ad: "Captain America: Kahramanların Savaşı", orijinal_ad: "Captain America: Civil War", yil: 2016, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.8", imdb_id: "tt3498820", aciklama: "Sokovia Anlaşmaları yüzünden Avengers'ın ikiye bölünmesi." },
+      { id: 36, sira: 36, ad: "Black Widow", orijinal_ad: "Black Widow", yil: 2021, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "6.6", imdb_id: "tt3480822", aciklama: "Natasha Romanoff'un Kızıl Oda geçmişi ve Yelena Belova ile buluşması." },
+      { id: 37, sira: 37, ad: "Black Panther", orijinal_ad: "Black Panther", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.3", imdb_id: "tt1825683", aciklama: "T'Challa'nın Wakanda kralı oluşu ve Erik Killmonger meydan okuması." },
+      { id: 38, sira: 38, ad: "Spider-Man: Eve Dönüş", orijinal_ad: "Spider-Man: Homecoming", yil: 2017, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.4", imdb_id: "tt2250912", aciklama: "Peter Parker'ın lise hayatı ile Vulture arasındaki denge mücadelesi." },
+      { id: 39, sira: 39, ad: "Doctor Strange", orijinal_ad: "Doctor Strange", yil: 2016, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.5", imdb_id: "tt1211837", aciklama: "Stephen Strange'in mistik sanatları öğrenip Dormammu'yu durdurması." },
+      { id: 40, sira: 40, ad: "Thor: Ragnarok", orijinal_ad: "Thor: Ragnarok", yil: 2017, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.9", imdb_id: "tt3501632", aciklama: "Sakaar gezegeni, Hulk ile gladyatör dövüşü ve Hela'nın Asgard işgali." },
+      { id: 41, sira: 41, ad: "Ant-Man ve Wasp", orijinal_ad: "Ant-Man and the Wasp", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.0", imdb_id: "tt5095030", aciklama: "Kuantum Aleminden Janet van Dyne'ı kurtarma operasyonu." },
+      { id: 42, sira: 42, ad: "Captain Marvel", orijinal_ad: "Captain Marvel", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "6.8", imdb_id: "tt4154664", aciklama: "1990'larda Carol Danvers'ın hafızasını ve kozmik güçlerini keşfi." },
+      { id: 43, sira: 43, ad: "Avengers: Sonsuzluk Savaşı", orijinal_ad: "Avengers: Infinity War", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "8.4", imdb_id: "tt4154756", aciklama: "Thanos'un altı Sonsuzluk Taşı'nı toplama harekatı." },
+      { id: 44, sira: 44, ad: "Avengers: Endgame", orijinal_ad: "Avengers: Endgame", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "8.4", imdb_id: "tt4154796", aciklama: "Zaman soygunu ve Sonsuzluk Destanı'nın epik final savaşı." },
+      { id: 45, sira: 45, ad: "Spider-Man: Evden Uzakta", orijinal_ad: "Spider-Man: Far From Home", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.4", imdb_id: "tt6320628", aciklama: "Endgame sonrası Avrupa gezisinde Peter Parker ve Mysterio." },
+
+      // BÖLÜM 5: Multiverse Saga – Phase 4
+      { id: 46, sira: 46, ad: "WandaVision", orijinal_ad: "WandaVision", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.9", imdb_id: "tt9140560", aciklama: "Westview kasabasında sitcom gerçekliği ve Scarlet Witch'in doğuşu." },
+      { id: 47, sira: 47, ad: "The Falcon and the Winter Soldier", orijinal_ad: "The Falcon and the Winter Soldier", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.1", imdb_id: "tt9208876", aciklama: "Sam Wilson'ın Kaptan Amerika kalkanını üstlenme yolculuğu." },
+      { id: 48, sira: 48, ad: "Loki (1. Sezon)", orijinal_ad: "Loki Season 1", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "8.2", imdb_id: "tt9140554", aciklama: "TVA (Zaman Değişimi Otoritesi) ve Çoklu Evren dallanmasının başlangıcı." },
+      { id: 49, sira: 49, ad: "What If...? (1. Sezon)", orijinal_ad: "What If...? Season 1", yil: 2021, tur: "Animasyon", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.4", imdb_id: "tt10168312", aciklama: "Watcher gözünden MCU tarihinin alternatif evren senaryoları." },
+      { id: 50, sira: 50, ad: "Shang-Chi ve On Halka Efsanesi", orijinal_ad: "Shang-Chi and the Legend of the Ten Rings", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.4", imdb_id: "tt9376612", aciklama: "Shang-Chi'nin babası Wenwu ve On Halka mirasıyla yüzleşmesi." },
+      { id: 51, sira: 51, ad: "Eternals", orijinal_ad: "Eternals", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.3", imdb_id: "tt9032400", aciklama: "Binlerce yıldır Dünya'da gizlenen ölümsüzlerin Celestial sınavı." },
+      { id: 52, sira: 52, ad: "Hawkeye", orijinal_ad: "Hawkeye", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.5", imdb_id: "tt10160804", aciklama: "Clint Barton ve Kate Bishop'ın New York'taki yılbaşı haftası macerası." },
+      { id: 53, sira: 53, ad: "Spider-Man: Eve Dönüş Yok", orijinal_ad: "Spider-Man: No Way Home", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "8.2", imdb_id: "tt10872600", aciklama: "Bozulan büyü sonucu üç Spider-Man evreninin kesişmesi." },
+      { id: 54, sira: 54, ad: "Moon Knight", orijinal_ad: "Moon Knight", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.3", imdb_id: "tt10234724", aciklama: "Marc Spector ve Steven Grant'in Mısır tanrısı Khonshu ile bağı." },
+      { id: 55, sira: 55, ad: "Doctor Strange: Çoklu Evren Çılgınlığında", orijinal_ad: "Doctor Strange in the Multiverse of Madness", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.9", imdb_id: "tt9419884", aciklama: "America Chavez ve Scarlet Witch ile çoklu evren yolculuğu." },
+      { id: 56, sira: 56, ad: "Ms. Marvel", orijinal_ad: "Ms. Marvel", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.2", imdb_id: "tt10857164", aciklama: "Kamala Khan'ın gizemli bilezikle kozmik güçlerini keşfetmesi." },
+      { id: 57, sira: 57, ad: "Thor: Aşk ve Gök Gürültüsü", orijinal_ad: "Thor: Love and Thunder", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.2", imdb_id: "tt10648342", aciklama: "Mighty Thor Jane Foster ve Tanrı Kasabı Gorr tehdidi." },
+      { id: 58, sira: 58, ad: "I Am Groot (2. Sezon)", orijinal_ad: "I Am Groot Season 2", yil: 2023, tur: "Animasyon", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.7", imdb_id: "tt13623148", aciklama: "Bebek Groot'un yeni kısa galaktik keşifleri." },
+      { id: 59, sira: 59, ad: "She-Hulk: Attorney at Law", orijinal_ad: "She-Hulk: Attorney at Law", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "5.3", imdb_id: "tt10857160", aciklama: "Avukat Jennifer Walters'ın süper insan hukuku davaları." },
+      { id: 60, sira: 60, ad: "Werewolf by Night", orijinal_ad: "Werewolf by Night", yil: 2022, tur: "Özel Yapım", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.2", imdb_id: "tt15318872", aciklama: "Klasik korku filmi estetiğinde canavar avcıları özel yapımı." },
+      { id: 61, sira: 61, ad: "Black Panther: Yaşasın Wakanda", orijinal_ad: "Black Panther: Wakanda Forever", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.7", imdb_id: "tt9114286", aciklama: "T'Challa'nın vedası ve Talokan kralı Namor ile çatışma." },
+      { id: 62, sira: 62, ad: "Galaksinin Koruyucuları: Tatil Özel", orijinal_ad: "The Guardians of the Galaxy Holiday Special", yil: 2022, tur: "Özel Yapım", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.9", imdb_id: "tt13623136", aciklama: "Drax ve Mantis'in Peter Quill için Kevin Bacon'ı kaçırma planı." },
+
+      // BÖLÜM 6: Multiverse Saga – Phase 5
+      { id: 63, sira: 63, ad: "Ant-Man ve Wasp: Quantumania", orijinal_ad: "Ant-Man and the Wasp: Quantumania", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.0", imdb_id: "tt10954600", aciklama: "Kuantum Aleminde Fatih Kang ile ilk büyük karşılaşma." },
+      { id: 64, sira: 64, ad: "Galaksinin Koruyucuları 3", orijinal_ad: "Guardians of the Galaxy Vol. 3", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.9", imdb_id: "tt6791350", aciklama: "Rocket'ın geçmişi ve Yüksek Evrimci'ye karşı son ekip görevi." },
+      { id: 65, sira: 65, ad: "Secret Invasion", orijinal_ad: "Secret Invasion", yil: 2023, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "5.9", imdb_id: "tt13157618", aciklama: "Nick Fury'nin Dünya'ya sızan asi Skrull grubunu durdurma çabası." },
+      { id: 66, sira: 66, ad: "Loki (2. Sezon)", orijinal_ad: "Loki Season 2", yil: 2023, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "8.2", imdb_id: "tt9140554", aciklama: "Zaman dokumasının çöküşü ve Loki'nin nihai fedakarlığı." },
+      { id: 67, sira: 67, ad: "The Marvels", orijinal_ad: "The Marvels", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "5.5", imdb_id: "tt10676048", aciklama: "Carol Danvers, Monica Rambeau ve Kamala Khan'ın güç karışması." },
+      { id: 68, sira: 68, ad: "What If...? (2. Sezon)", orijinal_ad: "What If...? Season 2", yil: 2023, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.4", imdb_id: "tt10168312", aciklama: "Kahhori ve alternatif çoklu evren hikayelerinin devamı." },
+      { id: 69, sira: 69, ad: "Echo", orijinal_ad: "Echo", yil: 2024, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.0", imdb_id: "tt13966962", aciklama: "Maya Lopez'in memleketine dönüşü ve Kingpin ile hesabı." },
+      { id: 70, sira: 70, ad: "X-Men '97 (1. Sezon)", orijinal_ad: "X-Men '97 Season 1", yil: 2024, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "8.8", imdb_id: "tt16026746", aciklama: "Klasik 90'lar X-Men animasyon serisinin doğrudan devamı." },
+      { id: 71, sira: 71, ad: "Deadpool & Wolverine", orijinal_ad: "Deadpool & Wolverine", yil: 2024, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.6", imdb_id: "tt6263850", aciklama: "Wade Wilson ve Logan'ın Void evreninde zaman çizgisini kurtarma macerası." },
+      { id: 72, sira: 72, ad: "Agatha All Along", orijinal_ad: "Agatha All Along", yil: 2024, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.2", imdb_id: "tt15571732", aciklama: "Güçlerini kaybeden Agatha Harkness'ın Cadılar Yolu yürüyüşü." },
+      { id: 73, sira: 73, ad: "What If...? (3. Sezon)", orijinal_ad: "What If...? Season 3", yil: 2024, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.4", imdb_id: "tt10168312", aciklama: "Watcher ve çoklu evren destanının final sezonu." },
+      { id: 74, sira: 74, ad: "Your Friendly Neighborhood Spider-Man", orijinal_ad: "Your Friendly Neighborhood Spider-Man", yil: 2025, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.5", imdb_id: "tt16027074", aciklama: "Alternatif zaman çizgisinde Peter Parker'ın Norman Osborn akıl hocalığı." },
+      { id: 75, sira: 75, ad: "Captain America: Cesur Yeni Dünya", orijinal_ad: "Captain America: Brave New World", yil: 2025, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.0", imdb_id: "tt14513804", aciklama: "Sam Wilson'ın Başkan Thaddeus Ross ve Red Hulk kriziyle sınavı." },
+      { id: 76, sira: 76, ad: "Daredevil: Born Again (1. Sezon)", orijinal_ad: "Daredevil: Born Again Season 1", yil: 2025, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "8.3", imdb_id: "tt18923754", aciklama: "Matt Murdock ve Belediye Başkanı Wilson Fisk'in New York hesaplaşması." },
+      { id: 77, sira: 77, ad: "Thunderbolts*", orijinal_ad: "Thunderbolts*", yil: 2025, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.2", imdb_id: "tt20969586", aciklama: "Yelena, Bucky, Red Guardian ve anti-kahramanların gizli görevi." },
+      { id: 78, sira: 78, ad: "Ironheart", orijinal_ad: "Ironheart", yil: 2025, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.1", imdb_id: "tt13623126", aciklama: "Riri Williams'ın teknoloji ile büyü (The Hood) arasındaki mücadelesi." },
+
+      // BÖLÜM 7: Multiverse Saga – Phase 6
+      { id: 79, sira: 79, ad: "The Fantastic Four: First Steps", orijinal_ad: "The Fantastic Four: First Steps", yil: 2025, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.3", imdb_id: "tt10676052", aciklama: "Retro-fütüristik 1960'lar dünyasında Fantastik Dörtlü ve Galactus." },
+      { id: 80, sira: 80, ad: "Eyes of Wakanda", orijinal_ad: "Eyes of Wakanda", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.1", imdb_id: "tt30406305", aciklama: "Tarih boyunca vibranyum eserlerini koruyan Wakanda savaşçıları." },
+      { id: 81, sira: 81, ad: "Marvel Zombies", orijinal_ad: "Marvel Zombies", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.2", imdb_id: "tt16027014", aciklama: "Zombi kıyametine sürüklenen alternatif evrende hayatta kalma savaşı." },
+      { id: 82, sira: 82, ad: "Wonder Man", orijinal_ad: "Wonder Man", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.0", imdb_id: "tt21066182", aciklama: "Simon Williams'ın Hollywood ve süper güçlerle kesişen kariyeri." },
+      { id: 83, sira: 83, ad: "Daredevil: Born Again (2. Sezon)", orijinal_ad: "Daredevil: Born Again Season 2", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "8.2", imdb_id: "tt18923754", aciklama: "Matt Murdock'un New York yeraltı dünyasındaki mücadelesinin devamı." },
+      { id: 84, sira: 84, ad: "Spider-Man: Brand New Day", orijinal_ad: "Spider-Man: Brand New Day", yil: 2026, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.8", imdb_id: "tt22084616", aciklama: "Kimliği unutulan Peter Parker'ın sokak seviyesindeki yeni başlangıcı." },
+      { id: 85, sira: 85, ad: "Vision Quest", orijinal_ad: "Vision Quest", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.1", imdb_id: "tt23112594", aciklama: "Beyaz Vision'ın anılarını ve kimliğini yeniden inşa etme yolculuğu." },
+
+      // BÖLÜM 8: Gelecek Avengers filmleri
+      { id: 86, sira: 86, ad: "Avengers: Doomsday", orijinal_ad: "Avengers: Doomsday", yil: 2026, tur: "Film", phase: "Gelecek Avengers", saga: "Gelecek Avengers filmleri", imdb: "—", imdb_id: "tt21357150", aciklama: "Doctor Doom tehdidine karşı çoklu evren kahramanlarının büyük birleşmesi." },
+      { id: 87, sira: 87, ad: "Avengers: Secret Wars", orijinal_ad: "Avengers: Secret Wars", yil: 2027, tur: "Film", phase: "Gelecek Avengers", saga: "Gelecek Avengers filmleri", imdb: "—", imdb_id: "tt21361444", aciklama: "Multiverse Saga'nın zirvesi ve Battleworld hesaplaşması." }
+    ];
+
+    const SAGA_ORDER = [
       "Infinity Saga – Phase 1",
       "Infinity Saga – Phase 2",
-      "Infinity Saga – Phase 3",
       "Defenders Saga",
+      "Infinity Saga – Phase 3",
       "Multiverse Saga – Phase 4",
       "Multiverse Saga – Phase 5",
       "Multiverse Saga – Phase 6",
-      "Gelecek Avengers Filmleri"
+      "Gelecek Avengers filmleri"
     ];
 
-    const MARVEL_CATALOG = [
-      // 1. Infinity Saga – Phase 1 (01 - 09)
-      { id: 1, sira: "01", ad: "Iron Man", orijinal_ad: "Iron Man", wiki: "Iron_Man_(2008_film)", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Dahi milyarder Tony Stark, esir düştüğü mağarada yüksek teknolojili bir zırh yaparak Iron Man'e dönüşür.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt0371746/" },
-      { id: 2, sira: "02", ad: "The Incredible Hulk", orijinal_ad: "The Incredible Hulk", wiki: "The_Incredible_Hulk_(film)", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Gama radyasyonuna maruz kalan Bruce Banner, öfkesini kontrol etmeye çalışırken ordudan kaçar.", imdb_puani: "6.6", imdb_url: "https://www.imdb.com/title/tt0800080/" },
-      { id: 3, sira: "03", ad: "Iron Man 2", orijinal_ad: "Iron Man 2", wiki: "Iron_Man_2", yil: 2010, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Kimliğini açıklayan Tony Stark, hem ark reaktörünün zehirlenmesi hem de intikam peşindeki Ivan Vanko ile yüzleşir.", imdb_puani: "6.9", imdb_url: "https://www.imdb.com/title/tt1228705/" },
-      { id: 4, sira: "04", ad: "Marvel One-Shot: The Consultant", orijinal_ad: "Marvel One-Shot: The Consultant", wiki: "Marvel_One-Shots", yil: 2011, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "S.H.I.E.L.D. ajanları Coulson ve Sitwell, General Ross'un Abomination'ı serbest bırakmasını engellemek için Tony Stark'ı gönderir.", imdb_puani: "6.5", imdb_url: "https://www.imdb.com/title/tt2011118/" },
-      { id: 5, sira: "05", ad: "Thor", orijinal_ad: "Thor", wiki: "Thor_(film)", yil: 2011, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Kibri yüzünden güçleri elinden alınıp Dünya'ya sürgün edilen Asgard prensi Thor, layık olmayı öğrenir.", imdb_puani: "7.0", imdb_url: "https://www.imdb.com/title/tt0800369/" },
-      { id: 6, sira: "06", ad: "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer", orijinal_ad: "A Funny Thing Happened on the Way to Thor's Hammer", wiki: "Marvel_One-Shots", yil: 2011, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Ajan Phil Coulson, New Mexico'ya giderken uğradığı benzin istasyonunda silahlı soyguncuları etkisiz hale getirir.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt2011109/" },
-      { id: 7, sira: "07", ad: "Captain America: İlk Yenilmez", orijinal_ad: "Captain America: The First Avenger", wiki: "Captain_America:_The_First_Avenger", yil: 2011, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "II. Dünya Savaşı'nda süper asker serumuyla güçlenen Steve Rogers, Kızıl Kafatası ve HYDRA'ya karşı savaşır.", imdb_puani: "6.9", imdb_url: "https://www.imdb.com/title/tt0458339/" },
-      { id: 8, sira: "08", ad: "Marvel One-Shot: Agent Carter", orijinal_ad: "Marvel One-Shot: Agent Carter", wiki: "Agent_Carter_(film)", yil: 2013, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Savaş sonrası SSR bürosunda masa başı işlere zorlanan Peggy Carter, gizemli Zodiac serumunu tek başına ele geçirir.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt3067038/" },
-      { id: 9, sira: "09", ad: "The Avengers (Yenilmezler)", orijinal_ad: "The Avengers", wiki: "The_Avengers_(2012_film)", yil: 2012, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", aciklama: "Nick Fury, Dünya'yı Loki ve Chitauri istilasından korumak için tarihin en güçlü kahramanlarını bir araya getirir.", imdb_puani: "8.0", imdb_url: "https://www.imdb.com/title/tt0848228/" },
+    const STORAGE_KEY = "mcu_watch_progress_v1";
+    const POSTER_CACHE_KEY = "mcu_poster_cache_v1";
+    const CLOUD_CFG_KEY = "mcu_github_cloud_cfg_v1";
 
-      // 2. Infinity Saga – Phase 2 (10 - 19)
-      { id: 10, sira: "10", ad: "Marvel One-Shot: Item 47", orijinal_ad: "Marvel One-Shot: Item 47", wiki: "Item_47", yil: 2012, tur: "Özel Yapım", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "New York Savaşı'ndan kalan bir Chitauri silahını bulan genç çift, banka soygunlarına başlar.", imdb_puani: "6.7", imdb_url: "https://www.imdb.com/title/tt2247732/" },
-      { id: 11, sira: "11", ad: "Iron Man 3", orijinal_ad: "Iron Man 3", wiki: "Iron_Man_3", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "New York travmasıyla boğuşan Tony Stark, gizemli terörist Mandarin ve Extremis tehdidine karşı zırhsız kalır.", imdb_puani: "7.1", imdb_url: "https://www.imdb.com/title/tt1300854/" },
-      { id: 12, sira: "12", ad: "Marvel One-Shot: All Hail the King", orijinal_ad: "Marvel One-Shot: All Hail the King", wiki: "All_Hail_the_King", yil: 2014, tur: "Özel Yapım", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Hapishanede ünlü gibi yaşayan Trevor Slattery, gerçek Mandarin'in adamları tarafından kaçırılır.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt3438640/" },
-      { id: 13, sira: "13", ad: "Agent Carter (1. Sezon)", orijinal_ad: "Marvel's Agent Carter - Season 1", wiki: "Agent_Carter_(TV_series)", yil: 2015, tur: "Dizi", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "1946 yılında Peggy Carter, vatana ihanetle suçlanan Howard Stark'ın adını temizlemek için gizli görev yürütür.", imdb_puani: "7.8", imdb_url: "https://www.imdb.com/title/tt3475734/" },
-      { id: 14, sira: "14", ad: "Agent Carter (2. Sezon)", orijinal_ad: "Marvel's Agent Carter - Season 2", wiki: "Agent_Carter_(TV_series)", yil: 2016, tur: "Dizi", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Los Angeles'a atanan Peggy Carter, Sıfır Maddesi (Zero Matter) adlı karanlık enerji tehdidiyle karşılaşır.", imdb_puani: "7.8", imdb_url: "https://www.imdb.com/title/tt3475734/" },
-      { id: 15, sira: "15", ad: "Thor: Karanlık Dünya", orijinal_ad: "Thor: The Dark World", wiki: "Thor:_The_Dark_World", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Jane Foster'ın bedenine giren kadim Aether gücü, Kara Elf Malekith'i uyandırır ve Thor'u Loki ile iş birliğine zorlar.", imdb_puani: "6.7", imdb_url: "https://www.imdb.com/title/tt1981115/" },
-      { id: 16, sira: "16", ad: "Captain America: Kış Askeri", orijinal_ad: "Captain America: The Winter Soldier", wiki: "Captain_America:_The_Winter_Soldier", yil: 2014, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "S.H.I.E.L.D. içindeki dev komployu ortaya çıkaran Steve Rogers, geçmişinden gelen suikastçı Kış Askeri ile savaşır.", imdb_puani: "7.7", imdb_url: "https://www.imdb.com/title/tt1843866/" },
-      { id: 17, sira: "17", ad: "Galaksinin Koruyucuları", orijinal_ad: "Guardians of the Galaxy", wiki: "Guardians_of_the_Galaxy_(film)", yil: 2014, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Uzaylı kanun kaçaklarından oluşan uyumsuz bir ekip, Sonsuzluk Taşı barındıran küreyi Ronan'dan korumak için birleşir.", imdb_puani: "8.0", imdb_url: "https://www.imdb.com/title/tt2015381/" },
-      { id: 18, sira: "18", ad: "Avengers: Ultron Çağı", orijinal_ad: "Avengers: Age of Ultron", wiki: "Avengers:_Age_of_Ultron", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Tony Stark'ın barış koruma programı Ultron kontrolden çıkarak insanlığı yok etmeye karar verir.", imdb_puani: "7.3", imdb_url: "https://www.imdb.com/title/tt2395427/" },
-      { id: 19, sira: "19", ad: "Ant-Man", orijinal_ad: "Ant-Man", wiki: "Ant-Man_(film)", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", aciklama: "Usta hırsız Scott Lang, Hank Pym'in küçülme teknolojisini kuşanarak Yellowjacket'ın planını durdurmaya çalışır.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt0478970/" },
+    let progressMap = {}; // { "1": "watched", "2": "watching", ... }
+    let posterCache = {}; // { "Iron Man": "https://..." }
+    let openSections = {}; // { "Infinity Saga – Phase 1": true }
+    let cloudSha = null;
+    let syncTimer = null;
 
-      // 3. Infinity Saga – Phase 3 (20 - 30)
-      { id: 20, sira: "20", ad: "Captain America: Kahramanların Savaşı", orijinal_ad: "Captain America: Civil War", wiki: "Captain_America:_Civil_War", yil: 2016, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Sokovia Anlaşmaları ve Bucky Barnes meselesi yüzünden Avengers ekibi Iron Man ve Captain America önderliğinde ikiye bölünür.", imdb_puani: "7.8", imdb_url: "https://www.imdb.com/title/tt3498820/" },
-      { id: 21, sira: "21", ad: "Black Widow", orijinal_ad: "Black Widow", wiki: "Black_Widow_(2021_film)", yil: 2021, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "İç Savaş'ın hemen ardından kaçak durumdaki Natasha Romanoff, Kızıl Oda'yı yok etmek için eski ailesiyle birleşir.", imdb_puani: "6.6", imdb_url: "https://www.imdb.com/title/tt3480822/" },
-      { id: 22, sira: "22", ad: "Black Panther", orijinal_ad: "Black Panther", wiki: "Black_Panther_(film)", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Babasının ölümünün ardından Wakanda tahtına çıkan T'Challa, sürgündeki kuzeni Killmonger'ın meydan okumasıyla karşılaşır.", imdb_puani: "7.3", imdb_url: "https://www.imdb.com/title/tt1825683/" },
-      { id: 23, sira: "23", ad: "Spider-Man: Eve Dönüş", orijinal_ad: "Spider-Man: Homecoming", wiki: "Spider-Man:_Homecoming", yil: 2017, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Genç Peter Parker, lise hayatıyla mahalle kahramanlığını dengelerken uzaylı teknolojisi satan Vulture'ın izini sürer.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt2250912/" },
-      { id: 24, sira: "24", ad: "Doctor Strange", orijinal_ad: "Doctor Strange", wiki: "Doctor_Strange_(2016_film)", yil: 2016, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Kaza sonrası ellerini kullanamayan cerrah Stephen Strange, Kamar-Taj'da mistik sanatların ustası haline gelir.", imdb_puani: "7.5", imdb_url: "https://www.imdb.com/title/tt1211837/" },
-      { id: 25, sira: "25", ad: "Thor: Ragnarok", orijinal_ad: "Thor: Ragnarok", wiki: "Thor:_Ragnarok", yil: 2017, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Sakaar gezegeninde gladyatör arenasına düşen Thor, Asgard'ı ölüm tanrıçası Hela'dan kurtarmak için Hulk ile iş birliği yapar.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt3501632/" },
-      { id: 26, sira: "26", ad: "Ant-Man ve Wasp", orijinal_ad: "Ant-Man and the Wasp", wiki: "Ant-Man_and_the_Wasp", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Ev hapsindeki Scott Lang, Janet van Dyne'ı Kuantum Aleminden kurtarmak için Hope ve Hank ile gizli bir göreve çıkar.", imdb_puani: "7.0", imdb_url: "https://www.imdb.com/title/tt5095030/" },
-      { id: 27, sira: "27", ad: "Avengers: Sonsuzluk Savaşı", orijinal_ad: "Avengers: Infinity War", wiki: "Avengers:_Infinity_War", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Evrendeki yaşamın yarısını yok etmek isteyen Thanos, altı Sonsuzluk Taşı'nı toplamak için tüm kahramanlarla savaşır.", imdb_puani: "8.4", imdb_url: "https://www.imdb.com/title/tt4154756/" },
-      { id: 28, sira: "28", ad: "Captain Marvel", orijinal_ad: "Captain Marvel", wiki: "Captain_Marvel_(film)", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "1990'larda Dünya'ya düşen Kree savaşçısı Carol Danvers, unuttuğu geçmişini keşfederken galaktik bir savaşın ortasında kalır.", imdb_puani: "6.8", imdb_url: "https://www.imdb.com/title/tt4154664/" },
-      { id: 29, sira: "29", ad: "Avengers: Endgame", orijinal_ad: "Avengers: Endgame", wiki: "Avengers:_Endgame", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Hayatta kalan Yenilmezler, Thanos'un yıkımını geri çevirmek için Kuantum Alemi üzerinden zamanda yolculuk yapar.", imdb_puani: "8.4", imdb_url: "https://www.imdb.com/title/tt4154796/" },
-      { id: 30, sira: "30", ad: "Spider-Man: Evden Uzakta", orijinal_ad: "Spider-Man: Far From Home", wiki: "Spider-Man:_Far_From_Home", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", aciklama: "Tony Stark'ın yasını tutan Peter Parker, Avrupa okul gezisinde gizemli kahraman Mysterio ile tanışır.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt6320628/" },
+    // =========================================================================
+    // 2. BAŞLATMA VE YEREL VERİ YÖNETİMİ
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", async () => {
+      loadLocalState();
+      SAGA_ORDER.forEach(s => { openSections[s] = true; });
+      renderApp();
+      updateCloudIndicator();
 
-      // 4. Defenders Saga (31 - 43)
-      { id: 31, sira: "31", ad: "Daredevil (1. Sezon)", orijinal_ad: "Marvel's Daredevil - Season 1", wiki: "Daredevil_(TV_series)", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Gündüzleri görme engelli avukat olan Matt Murdock, geceleri Hell's Kitchen sokaklarında Wilson Fisk'e karşı savaşır.", imdb_puani: "8.6", imdb_url: "https://www.imdb.com/title/tt3322312/" },
-      { id: 32, sira: "32", ad: "Jessica Jones (1. Sezon)", orijinal_ad: "Marvel's Jessica Jones - Season 1", wiki: "Jessica_Jones_(TV_series)", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Süper güçlü özel dedektif Jessica Jones, zihin kontrolü yeteneğine sahip sadist Kilgrave ile yüzleşmek zorunda kalır.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt2357547/" },
-      { id: 33, sira: "33", ad: "Daredevil (2. Sezon)", orijinal_ad: "Marvel's Daredevil - Season 2", wiki: "Daredevil_(season_2)", yil: 2016, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Matt Murdock'ın hayatına acımasız infazcı The Punisher ve eski sevgilisi Elektra ile El örgütü girer.", imdb_puani: "8.6", imdb_url: "https://www.imdb.com/title/tt3322312/" },
-      { id: 34, sira: "34", ad: "Luke Cage (1. Sezon)", orijinal_ad: "Marvel's Luke Cage - Season 1", wiki: "Luke_Cage_(TV_series)", yil: 2016, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Kurşun geçirmez deriye sahip Luke Cage, Harlem mahallesini suç baronu Cottonmouth'un elinden kurtarmaya çalışır.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt3322314/" },
-      { id: 35, sira: "35", ad: "Iron Fist (1. Sezon)", orijinal_ad: "Marvel's Iron Fist - Season 1", wiki: "Iron_Fist_(TV_series)", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Yıllar sonra New York'a dönen Danny Rand, mistik Demir Yumruk gücüyle aile şirketini ve şehri El örgütünden korur.", imdb_puani: "6.4", imdb_url: "https://www.imdb.com/title/tt3322310/" },
-      { id: 36, sira: "36", ad: "The Defenders (1. Sezon)", orijinal_ad: "Marvel's The Defenders", wiki: "The_Defenders_(miniseries)", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Daredevil, Jessica Jones, Luke Cage ve Iron Fist, New York'u yok etmek isteyen El örgütüne karşı güçlerini birleştirir.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt4230076/" },
-      { id: 37, sira: "37", ad: "The Punisher (1. Sezon)", orijinal_ad: "Marvel's The Punisher - Season 1", wiki: "The_Punisher_(TV_series)", yil: 2017, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Ailesinin intikamını alan Frank Castle, kendi askeri geçmişine uzanan derin bir hükümet komplosunu ortaya çıkarır.", imdb_puani: "8.4", imdb_url: "https://www.imdb.com/title/tt5675620/" },
-      { id: 38, sira: "38", ad: "Jessica Jones (2. Sezon)", orijinal_ad: "Marvel's Jessica Jones - Season 2", wiki: "Jessica_Jones_(season_2)", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Jessica Jones, kendisine güçlerini veren gizli deneylerin ardındaki karanlık gerçeği ve annesinin kaderini keşfeder.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt2357547/" },
-      { id: 39, sira: "39", ad: "Luke Cage (2. Sezon)", orijinal_ad: "Marvel's Luke Cage - Season 2", wiki: "Luke_Cage_(season_2)", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Harlem'in koruyucusu olarak ünlenen Luke Cage, kendisiyle eşit fiziksel güce sahip Bushmaster ile karşılaşır.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt3322314/" },
-      { id: 40, sira: "40", ad: "Iron Fist (2. Sezon)", orijinal_ad: "Marvel's Iron Fist - Season 2", wiki: "Iron_Fist_(season_2)", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Chinatown'da çete savaşlarını önlemeye çalışan Danny Rand, eski dostu Davos'un ihanetiyle yüzleşir.", imdb_puani: "6.4", imdb_url: "https://www.imdb.com/title/tt3322310/" },
-      { id: 41, sira: "41", ad: "Daredevil (3. Sezon)", orijinal_ad: "Marvel's Daredevil - Season 3", wiki: "Daredevil_(season_3)", yil: 2018, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "İnancını kaybeden Matt Murdock, hapisten çıkan Wilson Fisk ve ölümcül keskin nişancı Bullseye'a karşı son savaşını verir.", imdb_puani: "8.6", imdb_url: "https://www.imdb.com/title/tt3322312/" },
-      { id: 42, sira: "42", ad: "The Punisher (2. Sezon)", orijinal_ad: "Marvel's The Punisher - Season 2", wiki: "The_Punisher_(season_2)", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Genç bir kızı suikastçılardan koruyan Frank Castle, eski dostu Billy Russo'nun Jigsaw'a dönüşümüyle hesaplaşır.", imdb_puani: "8.4", imdb_url: "https://www.imdb.com/title/tt5675620/" },
-      { id: 43, sira: "43", ad: "Jessica Jones (3. Sezon)", orijinal_ad: "Marvel's Jessica Jones - Season 3", wiki: "Jessica_Jones_(season_3)", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", aciklama: "Jessica Jones zeki bir seri katilin izini sürerken, kız kardeşi Trish Walker'ın kontrolsüz kahramanlık arzusuyla çatışır.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt2357547/" },
-
-      // 5. Multiverse Saga – Phase 4 (44 - 60)
-      { id: 44, sira: "44", ad: "WandaVision", orijinal_ad: "WandaVision", wiki: "WandaVision", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Wanda Maximoff ve Vision, Westview kasabasında klasik sit-com dönemleri içinde kusursuz görünen bir hayat yaşar.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt9140560/" },
-      { id: 45, sira: "45", ad: "The Falcon and the Winter Soldier", orijinal_ad: "The Falcon and the Winter Soldier", wiki: "The_Falcon_and_the_Winter_Soldier", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Sam Wilson ve Bucky Barnes, Captain America kalkanının mirası üzerine düşünürken Flag Smashers grubuyla mücadele eder.", imdb_puani: "7.1", imdb_url: "https://www.imdb.com/title/tt9208876/" },
-      { id: 46, sira: "46", ad: "Loki (1. Sezon)", orijinal_ad: "Loki - Season 1", wiki: "Loki_(TV_series)", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Tesseract ile kaçan alternatif Loki, Zaman Varyans Otoritesi (TVA) tarafından yakalanır ve çoklu evrenin sırrını keşfeder.", imdb_puani: "8.2", imdb_url: "https://www.imdb.com/title/tt9140554/" },
-      { id: 47, sira: "47", ad: "What If...? (1. Sezon)", orijinal_ad: "What If...? - Season 1", wiki: "What_If...%3F_(TV_series)", yil: 2021, tur: "Animasyon", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Gözcü (The Watcher), Marvel evrenindeki kritik anların farklı geliştiği alternatif gerçeklikleri gözlemler.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt10168312/" },
-      { id: 48, sira: "48", ad: "Shang-Chi ve On Halka Efsanesi", orijinal_ad: "Shang-Chi and the Legend of the Ten Rings", wiki: "Shang-Chi_and_the_Legend_of_the_Ten_Rings", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Dövüş sanatları ustası Shang-Chi, On Halka örgütünün lideri olan babası Wenwu'nun karanlık geçmişiyle yüzleşir.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt9376612/" },
-      { id: 49, sira: "49", ad: "Eternals", orijinal_ad: "Eternals", wiki: "Eternals_(film)", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Binlerce yıldır Dünya'da gizlenen ölümsüz Eternals ekibi, kadim düşmanları Deviant'ların dönüşüyle yeniden toplanır.", imdb_puani: "6.3", imdb_url: "https://www.imdb.com/title/tt9032400/" },
-      { id: 50, sira: "50", ad: "Hawkeye", orijinal_ad: "Hawkeye", wiki: "Hawkeye_(TV_series)", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Noel öncesi ailesine dönmeye çalışan Clint Barton, Ronin geçmişinin peşine düşen genç okçu Kate Bishop ile ortak olur.", imdb_puani: "7.5", imdb_url: "https://www.imdb.com/title/tt10160804/" },
-      { id: 51, sira: "51", ad: "Spider-Man: Eve Dönüş Yok", orijinal_ad: "Spider-Man: No Way Home", wiki: "Spider-Man:_No_Way_Home", yil: 2021, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Kimliği ifşa olan Peter Parker'ın Doctor Strange'den istediği büyü ters gidince diğer evrenlerden düşmanlar gelir.", imdb_puani: "8.2", imdb_url: "https://www.imdb.com/title/tt10872600/" },
-      { id: 52, sira: "52", ad: "Moon Knight", orijinal_ad: "Moon Knight", wiki: "Moon_Knight_(TV_series)", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Çoklu kişilik bozukluğu yaşayan Steven Grant, Mısır ay tanrısı Khonshu'nun avatarı olan paralı asker Marc Spector'ı keşfeder.", imdb_puani: "7.3", imdb_url: "https://www.imdb.com/title/tt10234724/" },
-      { id: 53, sira: "53", ad: "Doctor Strange: Çoklu Evren Çılgınlığında", orijinal_ad: "Doctor Strange in the Multiverse of Madness", wiki: "Doctor_Strange_in_the_Multiverse_of_Madness", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Doctor Strange, evrenler arası geçiş yapabilen America Chavez'i Scarlet Witch'ten korumak için alternatif gerçekliklere gider.", imdb_puani: "6.9", imdb_url: "https://www.imdb.com/title/tt9419884/" },
-      { id: 54, sira: "54", ad: "Ms. Marvel", orijinal_ad: "Ms. Marvel", wiki: "Ms._Marvel_(TV_series)", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Captain Marvel hayranı genç Kamala Khan, aile yadigarı bilekliği taktığında kozmik enerji güçleri kazanır.", imdb_puani: "6.2", imdb_url: "https://www.imdb.com/title/tt10857164/" },
-      { id: 55, sira: "55", ad: "Thor: Aşk ve Gök Gürültüsü", orijinal_ad: "Thor: Love and Thunder", wiki: "Thor:_Love_and_Thunder", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "İç huzur arayan Thor, tüm tanrıları yok etmeye yeminli Gorr'u durdurmak için Mighty Thor'a dönüşen Jane Foster ile birleşir.", imdb_puani: "6.2", imdb_url: "https://www.imdb.com/title/tt10648342/" },
-      { id: 56, sira: "56", ad: "I Am Groot (1. Sezon)", orijinal_ad: "I Am Groot - Season 1", wiki: "I_Am_Groot", yil: 2022, tur: "Animasyon", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Bebek Groot'un galakside büyürken yaşadığı sevimli ve yaramaz kısa maceralar.", imdb_puani: "6.7", imdb_url: "https://www.imdb.com/title/tt13623148/" },
-      { id: 57, sira: "57", ad: "She-Hulk: Attorney at Law", orijinal_ad: "She-Hulk: Attorney at Law", wiki: "She-Hulk:_Attorney_at_Law", yil: 2022, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Kuzeni Bruce Banner'ın kanıyla Hulk güçleri kazanan avukat Jennifer Walters, süper insan hukuku davalarına bakar.", imdb_puani: "5.2", imdb_url: "https://www.imdb.com/title/tt10857160/" },
-      { id: 58, sira: "58", ad: "Werewolf by Night", orijinal_ad: "Werewolf by Night", wiki: "Werewolf_by_Night_(TV_special)", yil: 2022, tur: "Özel Yapım", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Klasik korku sineması tarzındaki bu özel yapımda canavar avcıları güçlü bir kalıntı için ölümcül bir ava katılır.", imdb_puani: "7.1", imdb_url: "https://www.imdb.com/title/tt15318872/" },
-      { id: 59, sira: "59", ad: "Black Panther: Yaşasın Wakanda", orijinal_ad: "Black Panther: Wakanda Forever", wiki: "Black_Panther:_Wakanda_Forever", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Kral T'Challa'nın kaybının ardından Wakanda liderleri, sualtı krallığı Talokan ve hükümdarı Namor'a karşı uluslarını korur.", imdb_puani: "6.7", imdb_url: "https://www.imdb.com/title/tt9114286/" },
-      { id: 60, sira: "60", ad: "The Guardians of the Galaxy Holiday Special", orijinal_ad: "The Guardians of the Galaxy Holiday Special", wiki: "The_Guardians_of_the_Galaxy_Holiday_Special", yil: 2022, tur: "Özel Yapım", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", aciklama: "Drax ve Mantis, üzgün olan Peter Quill'e unutulmaz bir Noel hediyesi vermek için Dünya'dan Kevin Bacon'ı kaçırır.", imdb_puani: "6.9", imdb_url: "https://www.imdb.com/title/tt13623136/" },
-
-      // 6. Multiverse Saga – Phase 5 (61 - 77)
-      { id: 61, sira: "61", ad: "Ant-Man ve Wasp: Quantumania", orijinal_ad: "Ant-Man and the Wasp: Quantumania", wiki: "Ant-Man_and_the_Wasp:_Quantumania", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Kuantum Alemine çekilen Scott Lang ve ailesi, zaman lordu Fatih Kang ile hayatta kalma savaşı verir.", imdb_puani: "6.0", imdb_url: "https://www.imdb.com/title/tt10954600/" },
-      { id: 62, sira: "62", ad: "Galaksinin Koruyucuları 3", orijinal_ad: "Guardians of the Galaxy Vol. 3", wiki: "Guardians_of_the_Galaxy_Vol._3", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Koruyucular, ağır yaralanan Rocket'ın hayatını kurtarmak ve acımasız yaratıcısı High Evolutionary ile yüzleşmek için son görevine çıkar.", imdb_puani: "7.9", imdb_url: "https://www.imdb.com/title/tt6791350/" },
-      { id: 63, sira: "63", ad: "Secret Invasion", orijinal_ad: "Secret Invasion", wiki: "Secret_Invasion_(TV_series)", yil: 2023, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Nick Fury, Dünya'nın kritik noktalarına sızan asi şekil değiştirici Skrull grubunun planını durdurmaya çalışır.", imdb_puani: "5.9", imdb_url: "https://www.imdb.com/title/tt13157618/" },
-      { id: 64, sira: "64", ad: "I Am Groot (2. Sezon)", orijinal_ad: "I Am Groot - Season 2", wiki: "I_Am_Groot", yil: 2023, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Bebek Groot, uzay gemisinde yeni gezegenleri ve gizemli nesneleri keşfederken komik belalara bulaşır.", imdb_puani: "6.7", imdb_url: "https://www.imdb.com/title/tt13623148/" },
-      { id: 65, sira: "65", ad: "Loki (2. Sezon)", orijinal_ad: "Loki - Season 2", wiki: "Loki_(season_2)", yil: 2023, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Zaman kayması yaşayan Loki, Mobius ve Sylvie ile birlikte çökmekte olan Zaman Dokuma Tezgahını kurtarmaya çalışır.", imdb_puani: "8.2", imdb_url: "https://www.imdb.com/title/tt9140554/" },
-      { id: 66, sira: "66", ad: "The Marvels", orijinal_ad: "The Marvels", wiki: "The_Marvels", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Güçleri birbirine dolanan Carol Danvers, Monica Rambeau ve Kamala Khan, Kree lideri Dar-Benn'e karşı takım olur.", imdb_puani: "5.5", imdb_url: "https://www.imdb.com/title/tt10676048/" },
-      { id: 67, sira: "67", ad: "What If...? (2. Sezon)", orijinal_ad: "What If...? - Season 2", wiki: "What_If...%3F_(season_2)", yil: 2023, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Gözcü, Nebula'nın Nova Corps'a katılmasından Kahhori'nin doğuşuna kadar çoklu evrenin yeni hikayelerini sunar.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt10168312/" },
-      { id: 68, sira: "68", ad: "Echo", orijinal_ad: "Echo", wiki: "Echo_(miniseries)", yil: 2024, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Kingpin'in suç imparatorluğundan kaçan Maya Lopez, Oklahoma'daki memleketine dönerek Choctaw kökleriyle bağ kurar.", imdb_puani: "6.0", imdb_url: "https://www.imdb.com/title/tt13966962/" },
-      { id: 69, sira: "69", ad: "X-Men '97 (1. Sezon)", orijinal_ad: "X-Men '97 - Season 1", wiki: "X-Men_'97", yil: 2024, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Klasik 90'lar serisinin devamında X-Men ekibi, Profesör X'in yokluğunda Magneto liderliğinde yeni tehditlerle yüzleşir.", imdb_puani: "8.8", imdb_url: "https://www.imdb.com/title/tt16026746/" },
-      { id: 70, sira: "70", ad: "Deadpool & Wolverine", orijinal_ad: "Deadpool & Wolverine", wiki: "Deadpool_%26_Wolverine", yil: 2024, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "TVA tarafından evreninin yok olacağını öğrenen Wade Wilson, isteksiz bir Wolverine varyantıyla çoklu evren yolculuğuna çıkar.", imdb_puani: "7.6", imdb_url: "https://www.imdb.com/title/tt6263850/" },
-      { id: 71, sira: "71", ad: "Agatha All Along", orijinal_ad: "Agatha All Along", wiki: "Agatha_All_Along_(miniseries)", yil: 2024, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Güçlerini kaybeden cadı Agatha Harkness, gizemli bir gençle birlikte efsanevi Cadılar Yolu'nda yürümek için meclis kurar.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt15571732/" },
-      { id: 72, sira: "72", ad: "What If...? (3. Sezon)", orijinal_ad: "What If...? - Season 3", wiki: "What_If...%3F_(season_3)", yil: 2024, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Çoklu evren destanının final sezonunda Gözcü'nün kuralları çiğnemesinin sonuçları ve kozmik savaşlar ekrana gelir.", imdb_puani: "7.4", imdb_url: "https://www.imdb.com/title/tt10168312/" },
-      { id: 73, sira: "73", ad: "Your Friendly Neighborhood Spider-Man", orijinal_ad: "Your Friendly Neighborhood Spider-Man", wiki: "Your_Friendly_Neighborhood_Spider-Man", yil: 2025, tur: "Animasyon", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Alternatif bir zaman çizgisinde Peter Parker'ın akıl hocasının Tony Stark yerine Norman Osborn olduğu Örümcek-Adam köken hikayesi.", imdb_puani: "7.5", imdb_url: "https://www.imdb.com/title/tt16027074/" },
-      { id: 74, sira: "74", ad: "Captain America: Cesur Yeni Dünya", orijinal_ad: "Captain America: Brave New World", wiki: "Captain_America:_Brave_New_World", yil: 2025, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Yeni Captain America Sam Wilson, ABD Başkanı seçilen Thaddeus Ross ile uluslararası bir krizin ortasında kalır.", imdb_puani: "5.9", imdb_url: "https://www.imdb.com/title/tt14513804/" },
-      { id: 75, sira: "75", ad: "Daredevil: Born Again", orijinal_ad: "Daredevil: Born Again", wiki: "Daredevil:_Born_Again", yil: 2025, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Matt Murdock adalet için mahkeme salonunda ve sokaklarda savaşırken, Wilson Fisk New York belediye başkanlığına aday olur.", imdb_puani: "8.2", imdb_url: "https://www.imdb.com/title/tt18923754/" },
-      { id: 76, sira: "76", ad: "Thunderbolts*", orijinal_ad: "Thunderbolts*", wiki: "Thunderbolts*", yil: 2025, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Yelena Belova, Bucky Barnes ve diğer anti-kahramanlar ölümcül bir tuzaktan kurtulmak için zorunlu bir ekip oluşturur.", imdb_puani: "7.2", imdb_url: "https://www.imdb.com/title/tt20969586/" },
-      { id: 77, sira: "77", ad: "Ironheart", orijinal_ad: "Ironheart", wiki: "Ironheart_(miniseries)", yil: 2025, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", aciklama: "Genç dahi Riri Williams, kendi geliştirdiği yüksek teknolojili zırhıyla teknoloji ve kara büyü arasındaki çatışmaya girer.", imdb_puani: "5.8", imdb_url: "https://www.imdb.com/title/tt13623126/" },
-
-      // 7. Multiverse Saga – Phase 6 (78 - 85)
-      { id: 78, sira: "78", ad: "Fantastik Dörtlü: İlk Adımlar", orijinal_ad: "The Fantastic Four: First Steps", wiki: "The_Fantastic_Four:_First_Steps", yil: 2025, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "1960'lar retro-fütüristik evreninde Reed Richards ve ailesi, Dünya'yı gezegen yiyen Galactus ve Silver Surfer'dan korur.", imdb_puani: "7.1", imdb_url: "https://www.imdb.com/title/tt10676052/" },
-      { id: 79, sira: "79", ad: "Eyes of Wakanda", orijinal_ad: "Eyes of Wakanda", wiki: "Eyes_of_Wakanda", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Wakanda tarih boyunca dünyaya dağılan tehlikeli vibranyum eserlerini geri toplamak için görevlendirilen savaşçıları anlatır.", imdb_puani: "7.0", imdb_url: "https://www.imdb.com/title/tt30423279/" },
-      { id: 80, sira: "80", ad: "Marvel Zombies", orijinal_ad: "Marvel Zombies", wiki: "Marvel_Zombies_(miniseries)", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Zombi salgınına yenik düşen süper kahramanların dünyasında yeni nesil hayatta kalanlar çaresiz bir mücadele verir.", imdb_puani: "7.3", imdb_url: "https://www.imdb.com/title/tt16027014/" },
-      { id: 81, sira: "81", ad: "Wonder Man", orijinal_ad: "Wonder Man", wiki: "Wonder_Man_(miniseries)", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Süper güçlere sahip aktör Simon Williams, Hollywood'da bir süper kahraman filminin başrolünü kapmaya çalışır.", imdb_puani: "6.9", imdb_url: "https://www.imdb.com/title/tt21066182/" },
-      { id: 82, sira: "82", ad: "Daredevil: Born Again (2. Sezon)", orijinal_ad: "Daredevil: Born Again - Season 2", wiki: "Daredevil:_Born_Again", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Belediye Başkanı Fisk'in sıkıyönetim ilan ettiği New York'ta Matt Murdock yeraltı direnişine öncülük eder.", imdb_puani: "8.3", imdb_url: "https://www.imdb.com/title/tt18923754/" },
-      { id: 83, sira: "83", ad: "Spider-Man: Brand New Day", orijinal_ad: "Spider-Man: Brand New Day", wiki: "Spider-Man:_Brand_New_Day", yil: 2026, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Herkes tarafından unutulan Peter Parker, üniversite hayatı ve sokak seviyesindeki yeni tehditlerle tek başına yüzleşir.", imdb_puani: "7.8", imdb_url: "https://www.imdb.com/title/tt22084616/" },
-      { id: 84, sira: "84", ad: "Vision Quest", orijinal_ad: "Vision Quest", wiki: "Vision_Quest_(TV_series)", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Beyaz Vision, anılarını ve insanlığını yeniden kazanmak için kendi benliğinin izini sürdüğü bir yolculuğa çıkar.", imdb_puani: "—", imdb_url: "https://www.imdb.com/title/tt23112576/" },
-      { id: 85, sira: "85", ad: "X-Men '97 (2. Sezon)", orijinal_ad: "X-Men '97 - Season 2", wiki: "X-Men_'97", yil: 2026, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", aciklama: "Zaman çizgilerine dağılan X-Men üyeleri, Apocalypse'in yükselişine karşı geçmiş ve gelecekte savaşır.", imdb_puani: "8.7", imdb_url: "https://www.imdb.com/title/tt16026746/" },
-
-      // 8. Gelecek Avengers Filmleri (86 - 87)
-      { id: 86, sira: "86", ad: "Avengers: Doomsday", orijinal_ad: "Avengers: Doomsday", wiki: "Avengers:_Doomsday", yil: 2026, tur: "Film", phase: "Phase 6", saga: "Gelecek Avengers Filmleri", aciklama: "Çoklu evrenin kaderini tehdit eden Victor von Doom (Doctor Doom)'a karşı tüm Marvel kahramanları bir araya gelir.", imdb_puani: "—", imdb_url: "https://www.imdb.com/title/tt21357150/" },
-      { id: 87, sira: "87", ad: "Avengers: Secret Wars", orijinal_ad: "Avengers: Secret Wars", yil: 2027, wiki: "Avengers:_Secret_Wars", tur: "Film", phase: "Phase 6", saga: "Gelecek Avengers Filmleri", aciklama: "Multiverse Saga'nın destansı finalinde çöken evrenlerin kalıntıları Battleworld'de son büyük savaşa sahne olur.", imdb_puani: "—", imdb_url: "https://www.imdb.com/title/tt21361444/" }
-    ];
-
-    // LocalStorage Anahtarları
-    const STORAGE_KEY = "marvel_watch_tracker_v1";
-    const POSTER_CACHE_KEY = "mcu_posters_v2";
-
-    // Uygulama Durumu
-    const state = {
-      statuses: {},
-      collapsedSections: {},
-      filters: {
-        search: "",
-        status: "ALL",
-        type: "ALL",
-        phase: "ALL"
+      // Bulut ayarı varsa açılışta GitHub'dan güncel progress.json çek
+      const cfg = getCloudConfig();
+      if (cfg && cfg.owner && cfg.repo && cfg.token) {
+        await pullFromGitHub(true);
       }
-    };
+    });
 
-    // DOM Referansları
-    const statsSummaryText = document.getElementById("statsSummaryText");
-    const progressPercentage = document.getElementById("progressPercentage");
-    const globalProgressBar = document.getElementById("globalProgressBar");
-    const countUnwatched = document.getElementById("countUnwatched");
-    const countWatching = document.getElementById("countWatching");
-    const countWatched = document.getElementById("countWatched");
-    const upNextCard = document.getElementById("upNextCard");
+    function loadLocalState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) progressMap = JSON.parse(saved) || {};
+      } catch (e) { progressMap = {}; }
 
-    const searchInput = document.getElementById("searchInput");
-    const clearSearchBtn = document.getElementById("clearSearchBtn");
-    const typeFilter = document.getElementById("typeFilter");
-    const phaseFilter = document.getElementById("phaseFilter");
-    const toggleAllAccordionsBtn = document.getElementById("toggleAllAccordionsBtn");
-    const statusFilterGroup = document.getElementById("statusFilterGroup");
-    const filterResultInfo = document.getElementById("filterResultInfo");
-    const sectionsContainer = document.getElementById("sectionsContainer");
-
-    const posterModal = document.getElementById("posterModal");
-    const posterModalContent = document.getElementById("posterModalContent");
-    const resetModal = document.getElementById("resetModal");
-    const btnExport = document.getElementById("btnExport");
-    const fileImport = document.getElementById("fileImport");
-    const btnResetOpen = document.getElementById("btnResetOpen");
-    const btnResetCancel = document.getElementById("btnResetCancel");
-    const btnResetConfirm = document.getElementById("btnResetConfirm");
-    const toastBanner = document.getElementById("toastBanner");
-    const toastIcon = document.getElementById("toastIcon");
-    const toastMessage = document.getElementById("toastMessage");
-
-    // Poster Önbelleği
-    let posterCache = {};
-    const posterInFlight = new Set();
-
-    try {
-      const savedPosters = localStorage.getItem(POSTER_CACHE_KEY);
-      if (savedPosters) posterCache = JSON.parse(savedPosters) || {};
-    } catch (e) {
-      posterCache = {};
+      try {
+        const cachedPosters = localStorage.getItem(POSTER_CACHE_KEY);
+        if (cachedPosters) posterCache = JSON.parse(cachedPosters) || {};
+      } catch (e) { posterCache = {}; }
     }
 
-    function savePosterCache() {
+    function saveLocalState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progressMap));
+    }
+
+    function getStatus(id) {
+      return progressMap[String(id)] || "unwatched";
+    }
+
+    function setStatus(id, newStatus) {
+      const key = String(id);
+      if (newStatus === "unwatched") {
+        delete progressMap[key];
+      } else {
+        progressMap[key] = newStatus;
+      }
+      saveLocalState();
+      renderApp();
+      scheduleCloudPush();
+    }
+
+    // =========================================================================
+    // 3. GITHUB BULUT SENKRONİZASYONU (progress.json OKUMA & YAZMA)
+    // =========================================================================
+    function getCloudConfig() {
       try {
-        localStorage.setItem(POSTER_CACHE_KEY, JSON.stringify(posterCache));
-      } catch (e) {
-        // Quota aşımında sessizce geç
+        return JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || "null");
+      } catch {
+        return null;
       }
     }
 
-    /**
-     * Bildirim çubuğunu gösterir
-     */
-    let toastTimer = null;
-    function showToast(msg, icon = "✅") {
-      if (!toastBanner) return;
-      toastIcon.textContent = icon;
-      toastMessage.textContent = msg;
-      toastBanner.classList.remove("hidden");
-      toastBanner.classList.add("flex");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toastBanner.classList.add("hidden");
-        toastBanner.classList.remove("flex");
-      }, 3000);
+    function openCloudModal() {
+      const cfg = getCloudConfig() || {};
+      document.getElementById("ghOwner").value = cfg.owner || "";
+      document.getElementById("ghRepo").value = cfg.repo || "";
+      document.getElementById("ghPath").value = cfg.path || "progress.json";
+      document.getElementById("ghToken").value = cfg.token || "";
+      hideModalMsg();
+      const modal = document.getElementById("cloudModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
     }
 
-    /**
-     * LocalStorage'dan kullanıcı ilerlemesini yükler
-     */
-    function loadFromStorage() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") {
-          state.statuses = parsed.statuses || {};
-          state.collapsedSections = parsed.collapsedSections || {};
+    function closeCloudModal() {
+      const modal = document.getElementById("cloudModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function showModalMsg(text, isError = false) {
+      const el = document.getElementById("cloudModalMsg");
+      el.textContent = text;
+      el.className = `text-xs p-2.5 rounded-lg border ${isError
+        ? "bg-red-950/60 border-red-800 text-red-200"
+        : "bg-emerald-950/60 border-emerald-800 text-emerald-200"}`;
+      el.classList.remove("hidden");
+    }
+
+    function hideModalMsg() {
+      document.getElementById("cloudModalMsg").classList.add("hidden");
+    }
+
+    function updateCloudIndicator() {
+      const cfg = getCloudConfig();
+      const dot = document.getElementById("cloudDot");
+      const btnText = document.getElementById("cloudBtnText");
+      const syncBtn = document.getElementById("btnSyncNow");
+      const statusLabel = document.getElementById("cloudStatusLabel");
+
+      if (cfg && cfg.owner && cfg.repo && cfg.token) {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+        btnText.textContent = `${cfg.repo} (Bağlı)`;
+        syncBtn.classList.remove("hidden");
+        statusLabel.textContent = `Bulut: ${cfg.owner}/${cfg.repo}`;
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-zinc-500";
+        btnText.textContent = "GitHub Bulut Ayarı";
+        syncBtn.classList.add("hidden");
+        statusLabel.textContent = "Yerel kayıt aktif";
+      }
+    }
+
+    async function saveAndTestCloudConfig() {
+      const owner = document.getElementById("ghOwner").value.trim();
+      const repo = document.getElementById("ghRepo").value.trim();
+      const path = document.getElementById("ghPath").value.trim() || "progress.json";
+      const token = document.getElementById("ghToken").value.trim();
+
+      if (!owner || !repo || !token) {
+        showModalMsg("Lütfen Kullanıcı Adı, Depo Adı ve Token alanlarını doldurun.", true);
+        return;
+      }
+
+      const cfg = { owner, repo, path, token };
+      localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cfg));
+      showModalMsg("GitHub deposuna bağlanılıyor...");
+
+      const pulled = await pullFromGitHub(true);
+      if (pulled === "NOT_FOUND") {
+        // Dosya depoda henüz yoksa mevcut yerel veriyi oluşturarak yaz
+        const pushed = await pushToGitHub();
+        if (pushed) {
+          showModalMsg("Bağlantı başarılı! progress.json dosyası deponuzda oluşturuldu.");
+          updateCloudIndicator();
+          setTimeout(closeCloudModal, 900);
+        } else {
+          showModalMsg("Dosya oluşturulamadı. Token yetkilerini (Contents: Read & Write) kontrol edin.", true);
         }
-      } catch (err) {
-        console.error("LocalStorage okuma hatası:", err);
+      } else if (pulled === true) {
+        showModalMsg("Bağlantı başarılı! Veriler GitHub ile eşitlendi.");
+        updateCloudIndicator();
+        setTimeout(closeCloudModal, 900);
+      } else {
+        showModalMsg("Bağlantı başarısız. Kullanıcı adı, depo adı veya token bilgisini kontrol edin.", true);
       }
     }
 
-    /**
-     * Mevcut durumu LocalStorage'a kaydeder
-     */
-    function saveToStorage() {
+    function disconnectCloud() {
+      localStorage.removeItem(CLOUD_CFG_KEY);
+      cloudSha = null;
+      updateCloudIndicator();
+      closeCloudModal();
+      showToast("GitHub bulut bağlantısı kaldırıldı.");
+    }
+
+    function encodeBase64Unicode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function decodeBase64Unicode(str) {
+      return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
+    }
+
+    async function pullFromGitHub(silent = false) {
+      const cfg = getCloudConfig();
+      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return false;
+
+      const statusLabel = document.getElementById("cloudStatusLabel");
+      statusLabel.textContent = "Buluttan okunuyor...";
+
       try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({
-            statuses: state.statuses,
-            collapsedSections: state.collapsedSections,
-            updatedAt: new Date().toISOString()
-          })
-        );
+        const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path}?t=${Date.now()}`;
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": `Bearer ${cfg.token}`,
+            "Accept": "application/vnd.github+json"
+          }
+        });
+
+        if (res.status === 404) {
+          statusLabel.textContent = "progress.json henüz oluşturulmadı";
+          return "NOT_FOUND";
+        }
+        if (!res.ok) {
+          statusLabel.textContent = "Bulut okuma hatası";
+          return false;
+        }
+
+        const data = await res.json();
+        cloudSha = data.sha;
+        const decoded = decodeBase64Unicode(data.content || "e30=");
+        const remoteObj = JSON.parse(decoded || "{}");
+
+        // Uzak veride kayıt varsa yerel ile birleştir/güncelle
+        if (remoteObj && typeof remoteObj === "object") {
+          const remoteProgress = remoteObj.progress || remoteObj;
+          if (Object.keys(remoteProgress).length > 0 || Object.keys(progressMap).length === 0) {
+            progressMap = remoteProgress;
+            saveLocalState();
+            renderApp();
+          } else if (Object.keys(progressMap).length > 0 && Object.keys(remoteProgress).length === 0) {
+            await pushToGitHub();
+          }
+        }
+
+        const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+        statusLabel.textContent = `Eşitlendi (${nowStr})`;
+        if (!silent) showToast("GitHub bulutundan güncel liste çekildi.");
+        return true;
       } catch (err) {
-        console.error("LocalStorage yazma hatası:", err);
+        statusLabel.textContent = "Bulut bağlantı hatası";
+        return false;
       }
     }
 
-    /**
-     * Çevrimdışı veya henüz posteri yüklenmemiş yapımlar için özel 2:3 SVG poster üretir
-     */
-    function buildFallbackPosterSVG(item) {
-      const palettes = {
-        "Phase 1": ["#991b1b", "#18181b", "#f59e0b"],
-        "Phase 2": ["#1e3a8a", "#09090b", "#38bdf8"],
-        "Phase 3": ["#581c87", "#09090b", "#e879f9"],
-        "Defenders Saga": ["#7f1d1d", "#09090b", "#f87171"],
-        "Phase 4": ["#065f46", "#09090b", "#34d399"],
-        "Phase 5": ["#831843", "#09090b", "#fb7185"],
-        "Phase 6": ["#312e81", "#09090b", "#818cf8"]
-      };
-      const [c1, c2, accent] = palettes[item.phase] || ["#9f1239", "#09090b", "#fb7185"];
-      const safeTitle = item.ad
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-      const words = safeTitle.split(" ");
-      const line1 = words.slice(0, 2).join(" ");
-      const line2 = words.slice(2, 5).join(" ");
+    async function pushToGitHub() {
+      const cfg = getCloudConfig();
+      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return false;
 
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300"><defs><linearGradient id="bg-${item.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><rect width="200" height="300" fill="url(#bg-${item.id})"/><rect x="8" y="8" width="184" height="284" rx="10" fill="none" stroke="${accent}" stroke-opacity="0.35" stroke-width="1.5"/><circle cx="100" cy="115" r="44" fill="none" stroke="${accent}" stroke-opacity="0.28" stroke-width="2"/><circle cx="100" cy="115" r="30" fill="${accent}" fill-opacity="0.12"/><text x="100" y="123" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="22">#${item.sira}</text><text x="100" y="34" text-anchor="middle" fill="${accent}" font-family="sans-serif" font-weight="700" font-size="10">MCU • ${item.phase.toUpperCase()}</text><text x="100" y="210" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="14">${line1}</text><text x="100" y="229" text-anchor="middle" fill="#e4e4e7" font-family="sans-serif" font-weight="700" font-size="12">${line2}</text><text x="100" y="272" text-anchor="middle" fill="#a1a1aa" font-family="sans-serif" font-weight="600" font-size="11">${item.yil} • ${item.tur}</text></svg>`;
+      const statusLabel = document.getElementById("cloudStatusLabel");
+      statusLabel.textContent = "Buluta kaydediliyor...";
+
+      try {
+        const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path}`;
+
+        // Güncel SHA yoksa önce mevcut dosyayı kontrol et
+        if (!cloudSha) {
+          const checkRes = await fetch(`${url}?t=${Date.now()}`, {
+            headers: {
+              "Authorization": `Bearer ${cfg.token}`,
+              "Accept": "application/vnd.github+json"
+            }
+          });
+          if (checkRes.ok) {
+            const checkData = await checkRes.json();
+            cloudSha = checkData.sha;
+          }
+        }
+
+        const payloadObj = {
+          updatedAt: new Date().toISOString(),
+          watchedCount: Object.values(progressMap).filter(v => v === "watched").length,
+          progress: progressMap
+        };
+
+        const body = {
+          message: `MCU izleme durumu güncellendi (${new Date().toLocaleString("tr-TR")})`,
+          content: encodeBase64Unicode(JSON.stringify(payloadObj, null, 2))
+        };
+        if (cloudSha) body.sha = cloudSha;
+
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${cfg.token}`,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          // SHA çakışması olduysa sıfırla ve tekrar dene
+          if (res.status === 409) {
+            cloudSha = null;
+          }
+          statusLabel.textContent = "Bulut kayıt hatası";
+          return false;
+        }
+
+        const data = await res.json();
+        cloudSha = data.content && data.content.sha ? data.content.sha : cloudSha;
+        const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+        statusLabel.textContent = `Buluta kaydedildi (${nowStr})`;
+        return true;
+      } catch (err) {
+        statusLabel.textContent = "Buluta yazılamadı";
+        return false;
+      }
+    }
+
+    function scheduleCloudPush() {
+      const cfg = getCloudConfig();
+      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => {
+        pushToGitHub();
+      }, 800);
+    }
+
+    async function manualSyncNow() {
+      const icon = document.getElementById("syncIcon");
+      icon.classList.add("animate-spin");
+      await pullFromGitHub(false);
+      icon.classList.remove("animate-spin");
+    }
+
+    // =========================================================================
+    // 4. POSTER OLUŞTURMA VE WIKIPEDIA POSTER GETİRME
+    // =========================================================================
+    function createFallbackPosterDataUri(item) {
+      const title = item.ad.length > 26 ? item.ad.slice(0, 24) + "…" : item.ad;
+      const num = String(item.sira).padStart(2, "0");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1f1215"/>
+            <stop offset="100%" stop-color="#09090b"/>
+          </linearGradient>
+        </defs>
+        <rect width="200" height="300" fill="url(#g)"/>
+        <rect x="8" y="8" width="184" height="284" rx="10" fill="none" stroke="#e62429" stroke-opacity="0.4" stroke-width="1.5"/>
+        <rect x="16" y="16" width="44" height="22" rx="4" fill="#e62429"/>
+        <text x="38" y="31" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">#${num}</text>
+        <text x="100" y="135" fill="#e62429" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle" letter-spacing="2">MARVEL</text>
+        <text x="100" y="160" fill="#f4f4f5" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">${escapeXml(title)}</text>
+        <text x="100" y="185" fill="#a1a1aa" font-family="sans-serif" font-size="11" text-anchor="middle">${item.yil} • ${item.tur}</text>
+      </svg>`;
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
     }
 
-    /**
-     * Dış kaynaklı poster yüklenemezse güvenli şekilde SVG postere geri döner
-     */
-    function handlePosterError(imgEl, id) {
-      imgEl.onerror = null;
-      const item = MARVEL_CATALOG.find((i) => i.id === id);
-      if (item) {
-        delete posterCache[id];
-        savePosterCache();
-        imgEl.src = buildFallbackPosterSVG(item);
-      }
+    function escapeXml(unsafe) {
+      return unsafe.replace(/[<>&'"]/g, c => ({
+        "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;"
+      }[c]));
     }
 
-    /**
-     * Wikipedia REST API üzerinden resmi poster görselini arka planda getirir
-     */
-    async function fetchPosterForItem(item) {
-      if (!item || !item.wiki || posterCache[item.id] || posterInFlight.has(item.id)) return;
-      posterInFlight.add(item.id);
+    async function fetchWikipediaPoster(item) {
+      if (posterCache[item.orijinal_ad]) return posterCache[item.orijinal_ad];
+      const cleanTitle = item.orijinal_ad.replace(/\s*\(Season \d+\)|\s*Season \d+/gi, "").trim();
       try {
-        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${item.wiki}`);
-        if (!res.ok) return;
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanTitle)}`);
+        if (!res.ok) return null;
         const data = await res.json();
-        const thumbUrl = data && data.thumbnail && data.thumbnail.source ? data.thumbnail.source : null;
-        if (thumbUrl) {
-          posterCache[item.id] = thumbUrl;
-          savePosterCache();
-          document.querySelectorAll(`img[data-poster-id="${item.id}"]`).forEach((img) => {
-            img.src = thumbUrl;
-          });
+        if (data && data.thumbnail && data.thumbnail.source) {
+          posterCache[item.orijinal_ad] = data.thumbnail.source;
+          localStorage.setItem(POSTER_CACHE_KEY, JSON.stringify(posterCache));
+          return data.thumbnail.source;
         }
-      } catch (e) {
-        // Ağ veya çevrimdışı hatasında fallback SVG görünmeye devam eder
-      } finally {
-        posterInFlight.delete(item.id);
-      }
+      } catch {}
+      return null;
     }
 
-    /**
-     * Görünür yapımların posterlerini küçük gruplar halinde arka planda çeker
-     */
-    function hydrateVisiblePosters(items) {
-      const missing = items.filter((item) => !posterCache[item.id] && !posterInFlight.has(item.id));
-      let idx = 0;
-      function nextBatch() {
-        const slice = missing.slice(idx, idx + 6);
-        if (slice.length === 0) return;
-        idx += 6;
-        Promise.all(slice.map((item) => fetchPosterForItem(item))).finally(() => {
-          setTimeout(nextBatch, 180);
-        });
-      }
-      nextBatch();
+    // =========================================================================
+    // 5. EKRAN ÇİZİMİ, İSTATİSTİKLER VE FİLTRELEME
+    // =========================================================================
+    function renderApp() {
+      updateStatsAndUpNext();
+      renderSections();
     }
 
-    function getItemStatus(id) {
-      return state.statuses[id] || "unwatched";
-    }
-
-    function setItemStatus(id, newStatus) {
-      if (newStatus === "unwatched") {
-        delete state.statuses[id];
-      } else {
-        state.statuses[id] = newStatus;
-      }
-      saveToStorage();
-      renderApp();
-    }
-
-    function cycleItemStatus(id) {
-      const current = getItemStatus(id);
-      const next = current === "unwatched" ? "watching" : current === "watching" ? "watched" : "unwatched";
-      setItemStatus(id, next);
-    }
-
-    function getTypeBadgeHTML(tur) {
-      switch (tur) {
-        case "Film":
-          return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-sky-500/15 text-sky-300 border border-sky-500/25">🎬 Film</span>`;
-        case "Dizi":
-          return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-purple-500/15 text-purple-300 border border-purple-500/25">📺 Dizi</span>`;
-        case "Özel Yapım":
-          return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/25">✨ Özel Yapım</span>`;
-        case "Animasyon":
-          return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-pink-500/15 text-pink-300 border border-pink-500/25">🎨 Animasyon</span>`;
-        default:
-          return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-zinc-800 text-zinc-300">${tur}</span>`;
-      }
-    }
-
-    function renderDashboard() {
-      const total = MARVEL_CATALOG.length;
+    function updateStatsAndUpNext() {
+      const total = MCU_ITEMS.length;
       let watched = 0;
       let watching = 0;
 
-      MARVEL_CATALOG.forEach((item) => {
-        const st = getItemStatus(item.id);
+      MCU_ITEMS.forEach(item => {
+        const st = getStatus(item.id);
         if (st === "watched") watched++;
         else if (st === "watching") watching++;
       });
 
       const unwatched = total - watched - watching;
-      const percentage = Math.round((watched / total) * 100);
+      const pct = Math.round((watched / total) * 100);
 
-      statsSummaryText.textContent = `${total} yapım | ${watched} izlendi | ${watching} izleniyor | ${unwatched} izlenmedi`;
-      progressPercentage.textContent = `%${percentage}`;
-      globalProgressBar.style.width = `${percentage}%`;
+      document.getElementById("statsSummaryText").textContent =
+        `${total} yapım | ${watched} izlendi | ${watching} izleniyor | ${unwatched} izlenmedi`;
+      document.getElementById("progressPercentText").textContent = `%${pct}`;
+      document.getElementById("mainProgressBar").style.width = `${pct}%`;
 
-      countUnwatched.textContent = unwatched;
-      countWatching.textContent = watching;
-      countWatched.textContent = watched;
+      // Sıradaki Yapım (Önce "watching", yoksa ilk "unwatched")
+      const nextItem =
+        MCU_ITEMS.find(i => getStatus(i.id) === "watching") ||
+        MCU_ITEMS.find(i => getStatus(i.id) === "unwatched") ||
+        MCU_ITEMS[MCU_ITEMS.length - 1];
 
-      const currentlyWatching = MARVEL_CATALOG.find((item) => getItemStatus(item.id) === "watching");
-      const firstUnwatched = MARVEL_CATALOG.find((item) => getItemStatus(item.id) === "unwatched");
+      const numStr = String(nextItem.sira).padStart(2, "0");
+      document.getElementById("upNextTitle").textContent = `${numStr} — ${nextItem.ad}`;
+      document.getElementById("upNextMeta").textContent =
+        `${getTypeIcon(nextItem.tur)} ${nextItem.tur} • ${nextItem.yil} • ${nextItem.saga} • ★ ${nextItem.imdb} IMDb`;
+      document.getElementById("upNextDesc").textContent = nextItem.aciklama;
 
-      if (currentlyWatching) {
-        const posterSrc = posterCache[currentlyWatching.id] || buildFallbackPosterSVG(currentlyWatching);
-        fetchPosterForItem(currentlyWatching);
-
-        upNextCard.innerHTML = `
-          <div class="flex items-start gap-3.5">
-            <button type="button" onclick="openPosterModal(${currentlyWatching.id})" class="w-16 h-24 sm:w-[72px] sm:h-[108px] rounded-xl overflow-hidden border border-amber-400/40 shadow-lg shrink-0 relative group cursor-pointer" title="Posteri büyüt">
-              <img data-poster-id="${currentlyWatching.id}" src="${posterSrc}" onerror="handlePosterError(this, ${currentlyWatching.id})" alt="${currentlyWatching.ad} Posteri" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-            </button>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2 mb-1.5">
-                <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                  Şu An İzleniyor
-                </span>
-                <span class="text-xs font-semibold text-zinc-400">#${currentlyWatching.sira}</span>
-              </div>
-              <h2 class="text-base sm:text-lg font-bold text-white line-clamp-1">${currentlyWatching.ad}</h2>
-              <p class="text-xs text-zinc-400 mt-0.5">${currentlyWatching.tur} • ${currentlyWatching.yil} • ${currentlyWatching.phase}</p>
-              <div class="mt-1.5">
-                <a href="${currentlyWatching.imdb_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-400/10 text-amber-300 border border-amber-400/25">
-                  ★ ${currentlyWatching.imdb_puani} IMDb ↗
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-zinc-800/80">
-            <button type="button" onclick="setItemStatus(${currentlyWatching.id}, 'watched')" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition cursor-pointer">
-              🟢 İzlendi İşaretle
-            </button>
-            <button type="button" onclick="jumpToItem(${currentlyWatching.id})" class="px-3 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition cursor-pointer">
-              Listede Gör ↓
-            </button>
-          </div>
-        `;
-      } else if (firstUnwatched) {
-        const posterSrc = posterCache[firstUnwatched.id] || buildFallbackPosterSVG(firstUnwatched);
-        fetchPosterForItem(firstUnwatched);
-
-        upNextCard.innerHTML = `
-          <div class="flex items-start gap-3.5">
-            <button type="button" onclick="openPosterModal(${firstUnwatched.id})" class="w-16 h-24 sm:w-[72px] sm:h-[108px] rounded-xl overflow-hidden border border-rose-500/40 shadow-lg shrink-0 relative group cursor-pointer" title="Posteri büyüt">
-              <img data-poster-id="${firstUnwatched.id}" src="${posterSrc}" onerror="handlePosterError(this, ${firstUnwatched.id})" alt="${firstUnwatched.ad} Posteri" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-            </button>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2 mb-1.5">
-                <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-rose-400">
-                  ▶ Sıradaki Yapım
-                </span>
-                <span class="text-xs font-semibold text-zinc-400">#${firstUnwatched.sira}</span>
-              </div>
-              <h2 class="text-base sm:text-lg font-bold text-white line-clamp-1">${firstUnwatched.ad}</h2>
-              <p class="text-xs text-zinc-400 mt-0.5">${firstUnwatched.tur} • ${firstUnwatched.yil} • ${firstUnwatched.phase}</p>
-              <div class="mt-1.5">
-                <a href="${firstUnwatched.imdb_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-400/10 text-amber-300 border border-amber-400/25">
-                  ★ ${firstUnwatched.imdb_puani} IMDb ↗
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-zinc-800/80">
-            <button type="button" onclick="setItemStatus(${firstUnwatched.id}, 'watching')" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition cursor-pointer">
-              ▶ İzlemeye Başla
-            </button>
-            <button type="button" onclick="setItemStatus(${firstUnwatched.id}, 'watched')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition cursor-pointer">
-              ✓ İzlendi
-            </button>
-            <button type="button" onclick="jumpToItem(${firstUnwatched.id})" class="px-2.5 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition cursor-pointer" title="Listede bul">
-              ↓
-            </button>
-          </div>
-        `;
-      } else {
-        upNextCard.innerHTML = `
-          <div class="flex flex-col items-center justify-center text-center h-full py-2">
-            <span class="text-2xl mb-1.5">🏆</span>
-            <h2 class="text-base font-bold text-emerald-400">Tebrikler! Tüm MCU Tamamlandı!</h2>
-            <p class="text-xs text-zinc-400 mt-1">Listedeki 87 yapımın tamamını izlediniz.</p>
-          </div>
-        `;
+      const upPoster = document.getElementById("upNextPoster");
+      upPoster.src = posterCache[nextItem.orijinal_ad] || createFallbackPosterDataUri(nextItem);
+      upPoster.dataset.itemId = nextItem.id;
+      if (!posterCache[nextItem.orijinal_ad]) {
+        fetchWikipediaPoster(nextItem).then(url => {
+          if (url && upPoster.dataset.itemId === String(nextItem.id)) upPoster.src = url;
+        });
       }
-    }
-
-    function jumpToItem(id) {
-      const targetItem = MARVEL_CATALOG.find((i) => i.id === id);
-      if (!targetItem) return;
-
-      if (state.filters.status !== "ALL" || state.filters.type !== "ALL" || state.filters.phase !== "ALL" || state.filters.search !== "") {
-        state.filters = { search: "", status: "ALL", type: "ALL", phase: "ALL" };
-        searchInput.value = "";
-        clearSearchBtn.classList.add("hidden");
-        typeFilter.value = "ALL";
-        phaseFilter.value = "ALL";
-        updateStatusPillsUI();
-      }
-
-      state.collapsedSections[targetItem.saga] = false;
-      saveToStorage();
-      renderApp();
-
-      setTimeout(() => {
-        const el = document.getElementById(`item-card-${id}`);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-          el.classList.add("ring-2", "ring-rose-500");
-          setTimeout(() => el.classList.remove("ring-2", "ring-rose-500"), 1800);
-        }
-      }, 60);
     }
 
     function getFilteredItems() {
-      const q = state.filters.search.trim().toLowerCase();
-      return MARVEL_CATALOG.filter((item) => {
-        const status = getItemStatus(item.id);
-        if (state.filters.status !== "ALL" && status !== state.filters.status) return false;
-        if (state.filters.type !== "ALL" && item.tur !== state.filters.type) return false;
-        if (state.filters.phase !== "ALL" && item.phase !== state.filters.phase) return false;
-        if (q) {
-          const matchAd = item.ad.toLowerCase().includes(q);
-          const matchOrig = item.orijinal_ad.toLowerCase().includes(q);
-          const matchSira = item.sira.includes(q);
-          if (!matchAd && !matchOrig && !matchSira) return false;
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const statusF = document.getElementById("statusFilter").value;
+      const typeF = document.getElementById("typeFilter").value;
+      const phaseF = document.getElementById("phaseFilter").value;
+
+      return MCU_ITEMS.filter(item => {
+        const st = getStatus(item.id);
+        if (statusF !== "all" && st !== statusF) return false;
+        if (typeF !== "all" && item.tur !== typeF) return false;
+        if (phaseF !== "all" && item.phase !== phaseF) return false;
+        if (query) {
+          const hay = `${item.ad} ${item.orijinal_ad} ${item.aciklama} ${item.yil} ${item.phase}`.toLowerCase();
+          if (!hay.includes(query)) return false;
         }
         return true;
       });
     }
 
     function renderSections() {
-      const filteredItems = getFilteredItems();
-      filterResultInfo.textContent = `${filteredItems.length} / ${MARVEL_CATALOG.length} yapım gösteriliyor`;
+      const container = document.getElementById("sectionsContainer");
+      const filtered = getFilteredItems();
+      document.getElementById("filterResultInfo").textContent = `Toplam ${filtered.length} / ${MCU_ITEMS.length} yapım gösteriliyor`;
 
-      if (filteredItems.length === 0) {
-        sectionsContainer.innerHTML = `
-          <div class="bg-[#18181b] border border-zinc-800 rounded-2xl p-10 text-center">
-            <p class="text-base font-semibold text-zinc-300">Arama veya filtrelere uygun yapım bulunamadı.</p>
-            <p class="text-xs text-zinc-500 mt-1 mb-4">Farklı bir anahtar kelime deneyebilir veya filtreleri temizleyebilirsiniz.</p>
-            <button type="button" onclick="clearAllFilters()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition cursor-pointer">
-              Filtreleri Temizle
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-10 text-center space-y-2">
+            <p class="text-zinc-300 font-semibold">Aramanıza veya filtrelerinize uygun yapım bulunamadı.</p>
+            <button onclick="clearFilters()" class="px-4 py-2 rounded-xl bg-[#e62429] text-white text-xs font-bold cursor-pointer">
+              Filtreleri Sıfırla
             </button>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
-      let html = "";
+      container.innerHTML = "";
 
-      SAGA_SECTIONS.forEach((sagaName, idx) => {
-        const allSectionItems = MARVEL_CATALOG.filter((i) => i.saga === sagaName);
-        const visibleSectionItems = filteredItems.filter((i) => i.saga === sagaName);
+      SAGA_ORDER.forEach(sagaName => {
+        const allInSaga = MCU_ITEMS.filter(i => i.saga === sagaName);
+        const visibleInSaga = filtered.filter(i => i.saga === sagaName);
+        if (visibleInSaga.length === 0) return;
 
-        if (visibleSectionItems.length === 0) return;
+        const watchedInSaga = allInSaga.filter(i => getStatus(i.id) === "watched").length;
+        const sagaPct = Math.round((watchedInSaga / allInSaga.length) * 100);
+        const isOpen = openSections[sagaName] !== false;
 
-        const sectionWatchedCount = allSectionItems.filter((i) => getItemStatus(i.id) === "watched").length;
-        const sectionTotalCount = allSectionItems.length;
-        const sectionPercent = Math.round((sectionWatchedCount / sectionTotalCount) * 100);
-        const isCollapsed = !!state.collapsedSections[sagaName];
+        const sectionEl = document.createElement("div");
+        sectionEl.className = "rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden";
 
-        html += `
-          <div class="bg-[#18181b]/70 border border-zinc-800/90 rounded-2xl overflow-hidden shadow-lg">
-            <button type="button" onclick="toggleSection('${sagaName.replace(/'/g, "\\'")}')" class="w-full px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/90 hover:bg-zinc-900 text-left transition cursor-pointer">
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-lg bg-rose-600/20 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center justify-center shrink-0">
-                  ${idx + 1}
-                </span>
-                <div>
-                  <h3 class="text-base sm:text-lg font-bold text-white">${sagaName}</h3>
-                  <p class="text-xs text-zinc-400 mt-0.5">
-                    <span class="font-semibold text-zinc-200">${sectionWatchedCount}/${sectionTotalCount} izlendi</span>
-                    ${visibleSectionItems.length !== sectionTotalCount ? ` • (${visibleSectionItems.length} filtrelendi)` : ""}
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3 self-end sm:self-center">
-                <div class="w-28 sm:w-36 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-rose-500 to-emerald-500 transition-all duration-300" style="width: ${sectionPercent}%;"></div>
-                </div>
-                <span class="text-xs font-semibold text-zinc-400 w-9 text-right">%${sectionPercent}</span>
-                <svg class="w-5 h-5 text-zinc-400 transform transition-transform duration-200 ${isCollapsed ? "" : "rotate-180"}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </div>
-            </button>
-
-            <div class="${isCollapsed ? "hidden" : "block"} p-3 sm:p-4 space-y-2.5 bg-[#09090b]/40">
-              ${visibleSectionItems.map((item) => renderItemCard(item)).join("")}
+        sectionEl.innerHTML = `
+          <button onclick="toggleSection('${sagaName.replace(/'/g, "\\'")}')"
+            class="w-full px-4 sm:px-5 py-3.5 bg-zinc-900/90 hover:bg-zinc-900 flex flex-wrap items-center justify-between gap-3 text-left transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}">▶</span>
+              <h3 class="font-display text-base sm:text-lg font-bold text-white uppercase tracking-wide">${sagaName}</h3>
             </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold ${watchedInSaga === allInSaga.length ? "text-emerald-400" : "text-zinc-300"}">
+                ${watchedInSaga}/${allInSaga.length} izlendi
+              </span>
+              <div class="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="h-full ${watchedInSaga === allInSaga.length ? "bg-emerald-500" : "bg-[#e62429]"}" style="width: ${sagaPct}%"></div>
+              </div>
+            </div>
+          </button>
+          <div class="${isOpen ? "block" : "hidden"} p-3 sm:p-4 space-y-2.5 border-t border-zinc-800/80">
+            ${visibleInSaga.map(item => renderItemCardHTML(item)).join("")}
           </div>
         `;
+
+        container.appendChild(sectionEl);
       });
 
-      sectionsContainer.innerHTML = html;
-      updateToggleAllButtonLabel();
-      hydrateVisiblePosters(filteredItems);
+      // Görünür kartların posterlerini arka planda yükle
+      visiblePosterHydration(filtered);
     }
 
-    function renderItemCard(item) {
-      const status = getItemStatus(item.id);
-      const posterSrc = posterCache[item.id] || buildFallbackPosterSVG(item);
-
-      let cardBgClass = "bg-[#18181b] border-zinc-800/90 hover:border-zinc-700";
-      let numberBadgeClass = "bg-zinc-900/95 text-zinc-200 border-zinc-700/80";
-      let titleClass = "text-white";
-      let selectBorderClass = "border-rose-500/40 bg-rose-950/30 text-rose-200";
-      let posterRingClass = "border-zinc-700/80";
-
-      if (status === "watched") {
-        cardBgClass = "bg-emerald-950/20 border-emerald-800/40 hover:border-emerald-700/60";
-        numberBadgeClass = "bg-emerald-600 text-white border-emerald-400/50";
-        titleClass = "text-emerald-100/90";
-        selectBorderClass = "border-emerald-500/40 bg-emerald-950/40 text-emerald-200";
-        posterRingClass = "border-emerald-500/50";
-      } else if (status === "watching") {
-        cardBgClass = "bg-amber-950/15 border-amber-700/40 hover:border-amber-600/60";
-        numberBadgeClass = "bg-amber-500 text-zinc-950 border-amber-300/60";
-        selectBorderClass = "border-amber-500/40 bg-amber-950/40 text-amber-200";
-        posterRingClass = "border-amber-400/60";
-      }
+    function renderItemCardHTML(item) {
+      const st = getStatus(item.id);
+      const numStr = String(item.sira).padStart(2, "0");
+      const cardClass = st === "watched" ? "card-watched" : st === "watching" ? "card-watching" : "card-unwatched";
+      const posterSrc = posterCache[item.orijinal_ad] || createFallbackPosterDataUri(item);
+      const imdbUrl = `https://www.imdb.com/title/${item.imdb_id}/`;
 
       return `
-        <article id="item-card-${item.id}" class="${cardBgClass} border rounded-xl p-3 sm:p-4 transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
-          <div class="flex items-start gap-3.5 min-w-0 flex-1">
-            <div class="relative shrink-0 group">
-              <button type="button" onclick="openPosterModal(${item.id})" class="block w-14 h-[84px] sm:w-16 sm:h-24 rounded-lg overflow-hidden border ${posterRingClass} bg-zinc-900 shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500" title="${item.ad} posterini büyüt">
-                <img
-                  data-poster-id="${item.id}"
-                  src="${posterSrc}"
-                  onerror="handlePosterError(this, ${item.id})"
-                  loading="lazy"
-                  alt="${item.ad} Posteri"
-                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                />
-              </button>
-              <button type="button" onclick="cycleItemStatus(${item.id})" title="Durumu hızlı değiştirmek için tıklayın" class="${numberBadgeClass} absolute -top-1.5 -left-1.5 min-w-[24px] h-6 px-1 rounded-md border font-extrabold text-[11px] flex items-center justify-center shadow-md transition hover:scale-110 cursor-pointer">
-                ${status === "watched" ? "✓" : item.sira}
-              </button>
+        <div id="item-card-${item.id}" class="${cardClass} rounded-xl border p-3 sm:p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+            <!-- Poster -->
+            <div class="relative shrink-0">
+              <img id="poster-${item.id}" src="${posterSrc}" alt="${item.ad}" loading="lazy"
+                class="w-12 h-[72px] sm:w-14 sm:h-[84px] rounded-lg object-cover border border-zinc-700/80 bg-zinc-950" />
+              <span class="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-700 text-[10px] font-bold text-zinc-200">
+                ${numStr}
+              </span>
             </div>
 
+            <!-- Bilgiler -->
             <div class="min-w-0 flex-1">
-              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span class="text-xs font-bold text-zinc-500">${item.sira} —</span>
-                <h4 class="text-sm sm:text-base font-bold ${titleClass} leading-snug">${item.ad}</h4>
-                ${item.orijinal_ad !== item.ad ? `<span class="text-xs text-zinc-500 italic">(${item.orijinal_ad})</span>` : ""}
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-sm sm:text-base text-white leading-snug ${st === "watched" ? "line-through decoration-emerald-500/60 text-zinc-300" : ""}">
+                  ${numStr} — ${item.ad}
+                </span>
+                ${st === "watched" ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">✓ İzlendi</span>` : ""}
               </div>
 
-              <div class="flex flex-wrap items-center gap-2 mt-1.5">
-                ${getTypeBadgeHTML(item.tur)}
-                <span class="text-xs font-medium text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded-md border border-zinc-800">${item.yil}</span>
-                <span class="text-xs font-medium text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded-md border border-zinc-800">${item.phase}</span>
-
-                <a href="${item.imdb_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/25 transition" title="IMDb sayfasını yeni sekmede aç">
-                  <span class="text-amber-400">★</span>
-                  <span>${item.imdb_puani}</span>
-                  <span class="text-[10px] text-amber-400/80 ml-0.5">IMDb ↗</span>
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-400 mt-1">
+                <span>${getTypeIcon(item.tur)} ${item.tur}</span>
+                <span>•</span>
+                <span>${item.yil}</span>
+                <span>•</span>
+                <span class="text-zinc-300 font-medium">${item.phase}</span>
+                <span>•</span>
+                <span class="inline-flex items-center gap-1 text-amber-400 font-semibold">★ ${item.imdb}</span>
+                <a href="${imdbUrl}" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition">
+                  IMDb ↗
                 </a>
               </div>
 
-              <p class="text-xs text-zinc-400 mt-2 leading-relaxed line-clamp-2 sm:line-clamp-none">
-                ${item.aciklama}
-              </p>
+              <p class="text-xs text-zinc-400 mt-1.5 line-clamp-2">${item.aciklama}</p>
             </div>
           </div>
 
-          <div class="flex items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-zinc-800/60">
-            <label for="status-select-${item.id}" class="sr-only">${item.ad} izleme durumu</label>
-            <select id="status-select-${item.id}" onchange="setItemStatus(${item.id}, this.value)" class="${selectBorderClass} w-full sm:w-40 px-3 py-2 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition cursor-pointer">
-              <option value="unwatched" class="bg-zinc-900 text-zinc-100" ${status === "unwatched" ? "selected" : ""}>🔴 İzlenmedi</option>
-              <option value="watching" class="bg-zinc-900 text-zinc-100" ${status === "watching" ? "selected" : ""}>🟡 İzleniyor</option>
-              <option value="watched" class="bg-zinc-900 text-zinc-100" ${status === "watched" ? "selected" : ""}>🟢 İzlendi</option>
+          <!-- Durum Seçici -->
+          <div class="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/70">
+            <select onchange="setStatus(${item.id}, this.value)" aria-label="İzleme durumu"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer focus:outline-none ${getSelectStyle(st)}">
+              <option value="unwatched" ${st === "unwatched" ? "selected" : ""}>🔴 İzlenmedi</option>
+              <option value="watching" ${st === "watching" ? "selected" : ""}>🟡 İzleniyor</option>
+              <option value="watched" ${st === "watched" ? "selected" : ""}>🟢 İzlendi</option>
             </select>
-          </div>
-        </article>
-      `;
-    }
-
-    function openPosterModal(id) {
-      const item = MARVEL_CATALOG.find((i) => i.id === id);
-      if (!item) return;
-
-      const status = getItemStatus(item.id);
-      const posterSrc = posterCache[item.id] || buildFallbackPosterSVG(item);
-
-      posterModalContent.innerHTML = `
-        <div class="flex flex-col sm:flex-row">
-          <div class="sm:w-56 bg-zinc-950 shrink-0 flex items-center justify-center p-4 sm:p-0">
-            <img src="${posterSrc}" onerror="handlePosterError(this, ${item.id})" alt="${item.ad} Posteri" class="w-44 sm:w-full h-auto aspect-[2/3] object-cover rounded-xl sm:rounded-none shadow-2xl" />
-          </div>
-          <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-            <div>
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">#${item.sira} • ${item.saga}</span>
-                  <h3 class="text-xl font-extrabold text-white mt-1">${item.ad}</h3>
-                  ${item.orijinal_ad !== item.ad ? `<p class="text-xs text-zinc-400 italic mt-0.5">${item.orijinal_ad}</p>` : ""}
-                </div>
-                <button type="button" onclick="closePosterModal()" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition cursor-pointer" title="Kapat">✕</button>
-              </div>
-
-              <div class="flex flex-wrap items-center gap-2 mt-3">
-                ${getTypeBadgeHTML(item.tur)}
-                <span class="text-xs font-medium text-zinc-300 bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-800">${item.yil}</span>
-                <span class="text-xs font-medium text-zinc-300 bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-800">${item.phase}</span>
-                <a href="${item.imdb_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 transition">
-                  ★ ${item.imdb_puani} IMDb ↗
-                </a>
-              </div>
-
-              <p class="text-sm text-zinc-300 mt-4 leading-relaxed">
-                ${item.aciklama}
-              </p>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-zinc-800">
-              <span class="block text-xs font-semibold text-zinc-400 mb-2">İzleme Durumunu Güncelle:</span>
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" onclick="setItemStatus(${item.id}, 'unwatched'); openPosterModal(${item.id});" class="py-2 px-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${status === "unwatched" ? "bg-rose-600 text-white border-rose-500" : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800"}">
-                  🔴 İzlenmedi
-                </button>
-                <button type="button" onclick="setItemStatus(${item.id}, 'watching'); openPosterModal(${item.id});" class="py-2 px-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${status === "watching" ? "bg-amber-500 text-zinc-950 border-amber-400" : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800"}">
-                  🟡 İzleniyor
-                </button>
-                <button type="button" onclick="setItemStatus(${item.id}, 'watched'); openPosterModal(${item.id});" class="py-2 px-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${status === "watched" ? "bg-emerald-600 text-white border-emerald-500" : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800"}">
-                  🟢 İzlendi
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       `;
-
-      posterModal.classList.remove("hidden");
-      posterModal.classList.add("flex");
     }
 
-    function closePosterModal() {
-      posterModal.classList.add("hidden");
-      posterModal.classList.remove("flex");
+    function getSelectStyle(status) {
+      if (status === "watched") return "bg-emerald-950/70 border-emerald-700/70 text-emerald-300";
+      if (status === "watching") return "bg-amber-950/70 border-amber-700/70 text-amber-300";
+      return "bg-zinc-950 border-zinc-700 text-zinc-200 hover:border-zinc-500";
     }
 
-    posterModal.addEventListener("click", (e) => {
-      if (e.target === posterModal) closePosterModal();
-    });
-
-    function toggleSection(sagaName) {
-      state.collapsedSections[sagaName] = !state.collapsedSections[sagaName];
-      saveToStorage();
-      renderSections();
+    function getTypeIcon(tur) {
+      if (tur === "Film") return "🎬";
+      if (tur === "Dizi") return "📺";
+      if (tur === "Animasyon") return "🎨";
+      return "✨";
     }
 
-    function updateToggleAllButtonLabel() {
-      const anyOpen = SAGA_SECTIONS.some((s) => !state.collapsedSections[s]);
-      toggleAllAccordionsBtn.textContent = anyOpen ? "Tümünü Kapat" : "Tümünü Aç";
-    }
-
-    function updateStatusPillsUI() {
-      const pills = statusFilterGroup.querySelectorAll(".status-pill");
-      pills.forEach((pill) => {
-        const st = pill.getAttribute("data-status");
-        if (st === state.filters.status) {
-          pill.className = "status-pill active px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 text-white transition cursor-pointer";
-        } else {
-          pill.className = "status-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition cursor-pointer";
+    function visiblePosterHydration(items) {
+      items.forEach(item => {
+        if (!posterCache[item.orijinal_ad]) {
+          fetchWikipediaPoster(item).then(url => {
+            if (url) {
+              const imgEl = document.getElementById(`poster-${item.id}`);
+              if (imgEl) imgEl.src = url;
+            }
+          });
         }
       });
     }
 
-    function clearAllFilters() {
-      state.filters = { search: "", status: "ALL", type: "ALL", phase: "ALL" };
-      searchInput.value = "";
-      clearSearchBtn.classList.add("hidden");
-      typeFilter.value = "ALL";
-      phaseFilter.value = "ALL";
-      updateStatusPillsUI();
+    // =========================================================================
+    // 6. ETKİLEŞİMLER, YEDEKLEME VE YARDIMCILAR
+    // =========================================================================
+    function toggleSection(sagaName) {
+      openSections[sagaName] = openSections[sagaName] === false ? true : false;
       renderSections();
     }
 
-    function renderApp() {
-      renderDashboard();
+    function expandAllSections(expand) {
+      SAGA_ORDER.forEach(s => { openSections[s] = expand; });
       renderSections();
     }
 
-    searchInput.addEventListener("input", (e) => {
-      state.filters.search = e.target.value;
-      clearSearchBtn.classList.toggle("hidden", !e.target.value);
+    function applyFilters() {
       renderSections();
-    });
+    }
 
-    clearSearchBtn.addEventListener("click", () => {
-      searchInput.value = "";
-      state.filters.search = "";
-      clearSearchBtn.classList.add("hidden");
+    function clearFilters() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("statusFilter").value = "all";
+      document.getElementById("typeFilter").value = "all";
+      document.getElementById("phaseFilter").value = "all";
       renderSections();
-    });
+    }
 
-    typeFilter.addEventListener("change", (e) => {
-      state.filters.type = e.target.value;
-      renderSections();
-    });
+    function scrollToUpNext() {
+      const nextItem =
+        MCU_ITEMS.find(i => getStatus(i.id) === "watching") ||
+        MCU_ITEMS.find(i => getStatus(i.id) === "unwatched") ||
+        MCU_ITEMS[0];
 
-    phaseFilter.addEventListener("change", (e) => {
-      state.filters.phase = e.target.value;
-      renderSections();
-    });
+      openSections[nextItem.saga] = true;
+      clearFilters();
 
-    statusFilterGroup.addEventListener("click", (e) => {
-      const btn = e.target.closest(".status-pill");
-      if (!btn) return;
-      state.filters.status = btn.getAttribute("data-status");
-      updateStatusPillsUI();
-      renderSections();
-    });
+      setTimeout(() => {
+        const el = document.getElementById(`item-card-${nextItem.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.classList.add("ring-2", "ring-[#e62429]");
+          setTimeout(() => el.classList.remove("ring-2", "ring-[#e62429]"), 2000);
+        }
+      }, 80);
+    }
 
-    toggleAllAccordionsBtn.addEventListener("click", () => {
-      const anyOpen = SAGA_SECTIONS.some((s) => !state.collapsedSections[s]);
-      SAGA_SECTIONS.forEach((s) => {
-        state.collapsedSections[s] = anyOpen;
-      });
-      saveToStorage();
-      renderSections();
-    });
+    function markUpNextAsWatched() {
+      const nextItem =
+        MCU_ITEMS.find(i => getStatus(i.id) === "watching") ||
+        MCU_ITEMS.find(i => getStatus(i.id) === "unwatched");
 
-    btnExport.addEventListener("click", () => {
-      const payload = {
-        app: "Marvel İzleme Rehberi",
-        version: 1,
+      if (!nextItem) {
+        showToast("Tebrikler! Tüm 87 yapım izlendi.");
+        return;
+      }
+      setStatus(nextItem.id, "watched");
+      showToast(`"${nextItem.ad}" izlendi olarak işaretlendi!`);
+    }
+
+    function resetAllProgress() {
+      if (!confirm("Tüm izleme ilerlemeniz sıfırlanacak ve tüm yapımlar 'İzlenmedi' yapılacak. Emin misiniz?")) return;
+      progressMap = {};
+      saveLocalState();
+      renderApp();
+      scheduleCloudPush();
+      showToast("Tüm izleme ilerlemesi sıfırlandı.");
+    }
+
+    function exportJSON() {
+      const dataStr = JSON.stringify({
         exportedAt: new Date().toISOString(),
-        statuses: state.statuses
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        progress: progressMap
+      }, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `marvel-izleme-rehberi-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
+      a.download = `marvel-izleme-yedek-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast("İzleme verileri JSON olarak indirildi.", "📥");
-    });
+      showToast("İzleme listesi JSON olarak indirildi.");
+    }
 
-    fileImport.addEventListener("change", (e) => {
-      const file = e.target.files[0];
+    function importJSON(event) {
+      const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = (e) => {
         try {
-          const parsed = JSON.parse(event.target.result);
-          const importedStatuses = parsed.statuses || parsed;
-          if (!importedStatuses || typeof importedStatuses !== "object") {
-            throw new Error("Geçersiz JSON formatı");
-          }
-
-          const validStatuses = {};
-          Object.keys(importedStatuses).forEach((key) => {
-            const val = importedStatuses[key];
-            if (val === "watched" || val === "watching") {
-              validStatuses[key] = val;
-            }
-          });
-
-          state.statuses = validStatuses;
-          saveToStorage();
+          const parsed = JSON.parse(e.target.result);
+          const imported = parsed.progress || parsed;
+          if (typeof imported !== "object") throw new Error("Geçersiz format");
+          progressMap = imported;
+          saveLocalState();
           renderApp();
-          showToast("Yedek dosyası başarıyla geri yüklendi!", "✅");
-        } catch (err) {
-          showToast("Geçersiz yedek dosyası seçildi.", "⚠️");
-        } finally {
-          fileImport.value = "";
+          scheduleCloudPush();
+          showToast("JSON yedeği başarıyla geri yüklendi!");
+        } catch {
+          alert("Seçilen JSON dosyası okunamadı veya formatı hatalı.");
         }
       };
       reader.readAsText(file);
-    });
+      event.target.value = "";
+    }
 
-    btnResetOpen.addEventListener("click", () => {
-      resetModal.classList.remove("hidden");
-      resetModal.classList.add("flex");
-    });
-
-    btnResetCancel.addEventListener("click", () => {
-      resetModal.classList.add("hidden");
-      resetModal.classList.remove("flex");
-    });
-
-    resetModal.addEventListener("click", (e) => {
-      if (e.target === resetModal) {
-        resetModal.classList.add("hidden");
-        resetModal.classList.remove("flex");
-      }
-    });
-
-    btnResetConfirm.addEventListener("click", () => {
-      state.statuses = {};
-      saveToStorage();
-      renderApp();
-      resetModal.classList.add("hidden");
-      resetModal.classList.remove("flex");
-      showToast("Tüm yapımlar 'İzlenmedi' olarak sıfırlandı.", "🔄");
-    });
-
-    // Uygulamayı hemen ve DOM hazır olduğunda başlat
-    loadFromStorage();
-    renderApp();
-    document.addEventListener("DOMContentLoaded", () => {
-      renderApp();
-    });
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.add("hidden"), 3000);
+    }
   </script>
 </body>
 </html>
