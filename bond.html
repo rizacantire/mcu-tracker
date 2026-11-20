@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>007 İzleme Rehberi — James Bond Takip & Firebase Senkronizasyon</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bond-gold: #d4af37;
+      --bond-gold-dark: #b59124;
+      --bg-base: #09090b;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-base);
+      color: #f4f4f5;
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(212, 175, 55, 0.14), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(212, 175, 55, 0.08), transparent 30%);
+    }
+    .font-display {
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.03em;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+    .card-watched {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.09) 0%, rgba(18, 18, 22, 0.96) 100%);
+      border-color: rgba(16, 185, 129, 0.28);
+    }
+    .card-watching {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.11) 0%, rgba(18, 18, 22, 0.96) 100%);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .card-unwatched {
+      background-color: #121216;
+      border-color: #27272a;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-[#d4af37] selection:text-zinc-950">
+
+  <header class="sticky top-0 z-30 border-b border-zinc-800/90 bg-zinc-950/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3.5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="px-2.5 py-1 bg-[#d4af37] text-zinc-950 font-display font-bold text-xl tracking-wider uppercase rounded shadow-lg shadow-amber-950/50 select-none">
+            007
+          </div>
+          <div>
+            <h1 class="font-display text-lg sm:text-xl font-bold tracking-wide text-white uppercase leading-tight">
+              James Bond İzleme Rehberi
+            </h1>
+            <p class="text-[11px] text-zinc-400">25 Resmi Film • Firebase Realtime Bulut Kayıt</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnSyncNow" onclick="manualSyncNow()" title="Firebase ile Şimdi Eşitle"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 transition cursor-pointer">
+            <span id="cloudDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+            <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Şimdi Eşitle</span>
+          </button>
+
+          <button onclick="exportJSON()" title="JSON Yedek İndir"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition cursor-pointer">
+            Dışa Aktar
+          </button>
+
+          <label title="JSON Yedek Yükle"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition cursor-pointer">
+            İçe Aktar
+            <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
+          </label>
+
+          <button onclick="resetAllProgress()" title="Tüm İlerlemeyi Sıfırla"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-red-950/60 border border-zinc-800 hover:border-red-800/60 text-zinc-400 hover:text-red-300 transition cursor-pointer">
+            Sıfırla
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-3 pt-3 border-t border-zinc-800/80">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs mb-1.5">
+          <div id="statsSummaryText" class="font-medium text-zinc-300">
+            25 film | 0 izlendi | 0 izleniyor | 25 izlenmedi
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="cloudStatusLabel" class="text-[11px] text-zinc-400">Başlatılıyor...</span>
+            <span id="progressPercentText" class="font-bold text-sm text-[#d4af37]">%0</span>
+          </div>
+        </div>
+        <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+          <div id="mainProgressBar" class="h-full bg-gradient-to-r from-[#b59124] to-[#facc15] transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <section id="upNextSection" class="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-amber-950/20 p-4 sm:p-5 shadow-xl">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <img id="upNextPoster" src="" alt="Sıradaki Film" class="w-16 h-24 rounded-lg object-cover border border-zinc-700 bg-zinc-950 shrink-0 shadow-md" />
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#facc15] text-[11px] font-bold uppercase tracking-wider mb-1">
+              <span>▶ Sıradaki Görev</span>
+            </div>
+            <h2 id="upNextTitle" class="text-lg sm:text-xl font-bold text-white leading-snug">01 — Dr. No</h2>
+            <p id="upNextMeta" class="text-xs text-zinc-400 mt-0.5">🤵 Sean Connery • 1962 • ★ 7.2 IMDb</p>
+            <p id="upNextDesc" class="text-xs text-zinc-300 mt-1.5 line-clamp-2 max-w-2xl"></p>
+          </div>
+        </div>
+        <div class="flex flex-wrap sm:flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto shrink-0">
+          <button onclick="scrollToUpNext()"
+            class="px-4 py-2 rounded-xl bg-[#d4af37] hover:bg-[#b59124] text-zinc-950 text-xs font-bold tracking-wide transition shadow-lg shadow-amber-950/40 cursor-pointer">
+            İzlemeye Devam Et
+          </button>
+          <button onclick="markUpNextAsWatched()"
+            class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-emerald-600/20 border border-zinc-700 hover:border-emerald-500/50 text-zinc-200 hover:text-emerald-300 text-xs font-semibold transition cursor-pointer">
+            🟢 İzlendi İşaretle
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <div class="md:col-span-6 relative">
+          <input type="text" id="searchInput" oninput="applyFilters()"
+            placeholder="Film, kötü karakter veya yıl ara (örn. Skyfall, Goldfinger, Casino Royale)..."
+            class="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#d4af37] focus:outline-none text-sm text-white placeholder-zinc-500" />
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <div class="md:col-span-3">
+          <select id="statusFilter" onchange="applyFilters()"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#d4af37] focus:outline-none text-sm text-zinc-200">
+            <option value="all">Durum: Tümü</option>
+            <option value="unwatched">🔴 Sadece İzlenmeyenler</option>
+            <option value="watching">🟡 İzleniyor</option>
+            <option value="watched">🟢 İzlendi</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-3">
+          <select id="actorFilter" onchange="applyFilters()"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#d4af37] focus:outline-none text-sm text-zinc-200">
+            <option value="all">Bond Aktörü: Tümü</option>
+            <option value="Sean Connery">Sean Connery (6 Film)</option>
+            <option value="George Lazenby">George Lazenby (1 Film)</option>
+            <option value="Roger Moore">Roger Moore (7 Film)</option>
+            <option value="Timothy Dalton">Timothy Dalton (2 Film)</option>
+            <option value="Pierce Brosnan">Pierce Brosnan (4 Film)</option>
+            <option value="Daniel Craig">Daniel Craig (5 Film)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400 pt-1">
+        <div id="filterResultInfo">Toplam 25 film listeleniyor</div>
+        <div class="flex items-center gap-3">
+          <button onclick="expandAllSections(true)" class="hover:text-white transition cursor-pointer">Tüm Dönemleri Aç</button>
+          <span>•</span>
+          <button onclick="expandAllSections(false)" class="hover:text-white transition cursor-pointer">Tümünü Daralt</button>
+          <span>•</span>
+          <button onclick="clearFilters()" class="text-[#d4af37] hover:underline cursor-pointer">Filtreleri Temizle</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="sectionsContainer" class="space-y-4"></div>
+  </main>
+
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-medium text-white shadow-2xl"></div>
+
+  <script>
+    // =========================================================================
+    // FIREBASE REALTIME DATABASE URL (SONUNDA SLASH OLMADAN)
+    // MCU ile aynı veritabanını kullanabilirsiniz; nodePath farklı olduğu için çakışmaz.
+    // =========================================================================
+    const EMBEDDED_FIREBASE_CONFIG = {
+      databaseUrl: "https://mcu-tracker-b2d6b-default-rtdb.firebaseio.com/",
+      nodePath: "bond_progress"
+    };
+
+    // =========================================================================
+    // 25 RESMİ EON PRODUCTIONS JAMES BOND FİLMİ (KRONOLOJİK SIRA)
+    // =========================================================================
+    const BOND_FILMS = [
+      { id: 1, sira: 1, ad: "Dr. No", orijinal_ad: "Dr. No", yil: 1962, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "7.2", imdb_id: "tt0055928", aciklama: "James Bond'un Jamaika'da kaybolan bir İngiliz ajanını araştırırken SPECTRE üyesi Dr. Julius No ile karşılaşması." },
+      { id: 2, sira: 2, ad: "Rusya'dan Sevgilerle", orijinal_ad: "From Russia with Love", yil: 1963, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "7.3", imdb_id: "tt0057076", aciklama: "Bond'un İstanbul'da Sovyet şifre çözücü cihazı Lektor'u ele geçirme ve SPECTRE tuzağından kurtulma görevi." },
+      { id: 3, sira: 3, ad: "Altın Parmak (Goldfinger)", orijinal_ad: "Goldfinger", yil: 1964, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "7.7", imdb_id: "tt0058150", aciklama: "Auric Goldfinger'ın Fort Knox altın rezervlerini radyoaktif hale getirme planını durdurma mücadelesi." },
+      { id: 4, sira: 4, ad: "Yıldırım Harekatı (Thunderball)", orijinal_ad: "Thunderball", yil: 1965, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "6.9", imdb_id: "tt0059800", aciklama: "SPECTRE'nin çaldığı iki NATO atom bombasını Bahamalar'da sualtı operasyonlarıyla arama görevi." },
+      { id: 5, sira: 5, ad: "İnsan İki Kere Yaşar", orijinal_ad: "You Only Live Twice", yil: 1967, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "6.8", imdb_id: "tt0062512", aciklama: "ABD ve Sovyet uzay kapsüllerini yutan gizemli aracın izinde Japonya'da Ernst Stavro Blofeld ile yüzleşme." },
+
+      { id: 6, sira: 6, ad: "Kraliçenin Hizmetinde", orijinal_ad: "On Her Majesty's Secret Service", yil: 1969, aktor: "George Lazenby", donem: "George Lazenby Dönemi (1969)", imdb: "6.8", imdb_id: "tt0064757", aciklama: "Bond'un İsviçre Alpleri'ndeki Piz Gloria kliniğinde Blofeld'in biyolojik saldırı planını bozması ve Tracy ile evliliği." },
+
+      { id: 7, sira: 7, ad: "Ölümsüz Elmaslar", orijinal_ad: "Diamonds Are Forever", yil: 1971, aktor: "Sean Connery", donem: "Sean Connery Dönemi (1962–1971)", imdb: "6.5", imdb_id: "tt0066995", aciklama: "Sean Connery'nin dönüşünde Bond'un Las Vegas üzerinden Blofeld'in uydu lazer silahını durdurması." },
+
+      { id: 8, sira: 8, ad: "Yaşamak İçin Öldür", orijinal_ad: "Live and Let Die", yil: 1973, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.7", imdb_id: "tt0070328", aciklama: "Roger Moore'un ilk Bond görevinde Harlem, New Orleans ve Karayipler'de Dr. Kananga ile mücadelesi." },
+      { id: 9, sira: 9, ad: "Altın Tabancalı Adam", orijinal_ad: "The Man with the Golden Gun", yil: 1974, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.7", imdb_id: "tt0071807", aciklama: "Dünyanın en ölümcül suikastçısı Francisco Scaramanga ve güneş enerjisi cihazı Solex Agitator avı." },
+      { id: 10, sira: 10, ad: "Beni Seven Casus", orijinal_ad: "The Spy Who Loved Me", yil: 1977, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "7.0", imdb_id: "tt0076752", aciklama: "Bond ve KGB ajanı Anya Amasova'nın nükleer denizaltıları kaçıran Karl Stromberg ve Jaws'a karşı işbirliği." },
+      { id: 11, sira: 11, ad: "Ay Harekatı (Moonraker)", orijinal_ad: "Moonraker", yil: 1979, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.2", imdb_id: "tt0079574", aciklama: "Kaçırılan bir uzay mekiğinin izinde Venedik'ten uzay yörüngesine uzanan Hugo Drax operasyonu." },
+      { id: 12, sira: 12, ad: "Yalnız Senin Gözlerin İçin", orijinal_ad: "For Your Eyes Only", yil: 1981, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.7", imdb_id: "tt0082398", aciklama: "İyon Denizi'nde batan İngiliz casus gemisindeki ATAC şifre cihazını KGB'den önce kurtarma yarışı." },
+      { id: 13, sira: 13, ad: "Ahtapot (Octopussy)", orijinal_ad: "Octopussy", yil: 1983, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.5", imdb_id: "tt0086034", aciklama: "Sahte Fabergé yumurtası cinayetinden Hindistan ve Berlin'de bir Amerikan üssüne nükleer saldırı planına uzanan takip." },
+      { id: 14, sira: 14, ad: "Ölüme Bir Bakış", orijinal_ad: "A View to a Kill", yil: 1985, aktor: "Roger Moore", donem: "Roger Moore Dönemi (1973–1985)", imdb: "6.3", imdb_id: "tt0090264", aciklama: "Roger Moore'un son Bond filminde Max Zorin'in Silikon Vadisi'ni sular altında bırakma komplosunu engellemesi." },
+
+      { id: 15, sira: 15, ad: "Gün Işığında Suikast", orijinal_ad: "The Living Daylights", yil: 1987, aktor: "Timothy Dalton", donem: "Timothy Dalton Dönemi (1987–1989)", imdb: "6.7", imdb_id: "tt0093428", aciklama: "Timothy Dalton'ın daha sert Bond yorumuyla Bratislava'dan Afganistan'a uzanan KGB ve silah kaçakçılığı ağı." },
+      { id: 16, sira: 16, ad: "Öldürme Yetkisi", orijinal_ad: "Licence to Kill", yil: 1989, aktor: "Timothy Dalton", donem: "Timothy Dalton Dönemi (1987–1989)", imdb: "6.7", imdb_id: "tt0097742", aciklama: "Yakın dostu Felix Leiter'a saldıran uyuşturucu baronu Franz Sanchez'in peşine düşen Bond'un MI6'ten istifa edip intikam alması." },
+
+      { id: 17, sira: 17, ad: "Altın Göz (GoldenEye)", orijinal_ad: "GoldenEye", yil: 1995, aktor: "Pierce Brosnan", donem: "Pierce Brosnan Dönemi (1995–2002)", imdb: "7.2", imdb_id: "tt0113189", aciklama: "Pierce Brosnan'ın ilk filminde eski 006 ajanı Alec Trevelyan'ın uzay tabanlı elektromanyetik silah GoldenEye tehdidi." },
+      { id: 18, sira: 18, ad: "Yarın Asla Ölmez", orijinal_ad: "Tomorrow Never Dies", yil: 1997, aktor: "Pierce Brosnan", donem: "Pierce Brosnan Dönemi (1995–2002)", imdb: "6.5", imdb_id: "tt0120347", aciklama: "Medya patronu Elliot Carver'ın İngiltere ile Çin arasında savaş çıkararak yayın tekeli kurma planını bozma görevi." },
+      { id: 19, sira: 19, ad: "Dünya Yetmez", orijinal_ad: "The World Is Not Enough", yil: 1999, aktor: "Pierce Brosnan", donem: "Pierce Brosnan Dönemi (1995–2002)", imdb: "6.4", imdb_id: "tt0143145", aciklama: "Petrol varisi Elektra King ve acıyı hissetmeyen terörist Renard'ın İstanbul Boğazı'nda nükleer denizaltı planı." },
+      { id: 20, sira: 20, ad: "Başka Gün Öl", orijinal_ad: "Die Another Day", yil: 2002, aktor: "Pierce Brosnan", donem: "Pierce Brosnan Dönemi (1995–2002)", imdb: "6.1", imdb_id: "tt0246460", aciklama: "Kuzey Kore esaretinden kurtulan Bond'un İzlanda'daki buz sarayında Gustav Graves ve Icarus uydusuyla hesaplaşması." },
+
+      { id: 21, sira: 21, ad: "Casino Royale", orijinal_ad: "Casino Royale", yil: 2006, aktor: "Daniel Craig", donem: "Daniel Craig Dönemi (2006–2021)", imdb: "8.0", imdb_id: "tt0381061", aciklama: "00 statüsünü yeni kazanan Daniel Craig'in Karadağ'daki yüksek bahisli poker masasında Le Chiffre ve Vesper Lynd ile sınavı." },
+      { id: 22, sira: 22, ad: "Quantum of Solace", orijinal_ad: "Quantum of Solace", yil: 2008, aktor: "Daniel Craig", donem: "Daniel Craig Dönemi (2006–2021)", imdb: "6.5", imdb_id: "tt0830515", aciklama: "Vesper'ın ihanetinin ardındaki gizli Quantum örgütünü ve Dominic Greene'in Bolivya su kaynakları komplosunu çözme arayışı." },
+      { id: 23, sira: 23, ad: "Skyfall", orijinal_ad: "Skyfall", yil: 2012, aktor: "Daniel Craig", donem: "Daniel Craig Dönemi (2006–2021)", imdb: "7.8", imdb_id: "tt1074638", aciklama: "İstanbul'da vurulan Bond'un MI6'e saldıran eski ajan Raoul Silva'ya karşı M'i İskoçya'daki çocukluk malikanesinde koruması." },
+      { id: 24, sira: 24, ad: "Spectre", orijinal_ad: "Spectre", yil: 2015, aktor: "Daniel Craig", donem: "Daniel Craig Dönemi (2006–2021)", imdb: "6.8", imdb_id: "tt2379713", aciklama: "Meksika'dan Roma ve Fas'a uzanan izlerin Bond'u küresel gölge örgüt SPECTRE ve Franz Oberhauser'e götürmesi." },
+      { id: 25, sira: 25, ad: "Ölmek İçin Zaman Yok", orijinal_ad: "No Time to Die", yil: 2021, aktor: "Daniel Craig", donem: "Daniel Craig Dönemi (2006–2021)", imdb: "7.3", imdb_id: "tt2382320", aciklama: "Emekliliğinden geri dönen Bond'un DNA hedefli biyolojik silah Heracles'i ve Lyutsifer Safin'i durdurduğu final görevi." }
+    ];
+
+    const ERA_ORDER = [
+      "Sean Connery Dönemi (1962–1971)",
+      "George Lazenby Dönemi (1969)",
+      "Roger Moore Dönemi (1973–1985)",
+      "Timothy Dalton Dönemi (1987–1989)",
+      "Pierce Brosnan Dönemi (1995–2002)",
+      "Daniel Craig Dönemi (2006–2021)"
+    ];
+
+    const STORAGE_KEY = "bond_watch_progress_v1";
+    const POSTER_CACHE_KEY = "bond_poster_cache_v1";
+
+    let progressMap = {};
+    let posterCache = {};
+    let openSections = {};
+    let syncTimer = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      loadLocalState();
+      ERA_ORDER.forEach(e => { openSections[e] = true; });
+      renderApp();
+
+      if (getFirebaseEndpoint()) {
+        setCloudUI("ready", "Firebase bağlı");
+        await pullFromFirebase(true);
+      } else {
+        setCloudUI("unconfigured", "databaseUrl girilmedi (yalnızca yerel kayıt)");
+      }
+    });
+
+    function getFirebaseEndpoint() {
+      const base = (EMBEDDED_FIREBASE_CONFIG.databaseUrl || "").trim().replace(/\/+$/, "");
+      const node = (EMBEDDED_FIREBASE_CONFIG.nodePath || "bond_progress").trim().replace(/^\/+|\/+$/g, "");
+      if (!base) return "";
+      return `${base}/${node}.json`;
+    }
+
+    function setCloudUI(stateType, labelText) {
+      const dot = document.getElementById("cloudDot");
+      const label = document.getElementById("cloudStatusLabel");
+      label.textContent = labelText;
+      if (stateType === "ready") {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+      } else if (stateType === "syncing") {
+        dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-zinc-500";
+      }
+    }
+
+    function loadLocalState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) progressMap = JSON.parse(saved) || {};
+      } catch { progressMap = {}; }
+
+      try {
+        const cachedPosters = localStorage.getItem(POSTER_CACHE_KEY);
+        if (cachedPosters) posterCache = JSON.parse(cachedPosters) || {};
+      } catch { posterCache = {}; }
+    }
+
+    function saveLocalState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progressMap));
+    }
+
+    function getStatus(id) {
+      return progressMap[String(id)] || "unwatched";
+    }
+
+    function setStatus(id, newStatus) {
+      const key = String(id);
+      if (newStatus === "unwatched") delete progressMap[key];
+      else progressMap[key] = newStatus;
+      saveLocalState();
+      renderApp();
+      scheduleFirebasePush();
+    }
+
+    async function pullFromFirebase(silent = false) {
+      const endpoint = getFirebaseEndpoint();
+      if (!endpoint) return false;
+      setCloudUI("syncing", "Firebase'den okunuyor...");
+
+      try {
+        const res = await fetch(`${endpoint}?t=${Date.now()}`, { method: "GET" });
+        if (!res.ok) {
+          setCloudUI("unconfigured", `Firebase okuma hatası (${res.status}) — URL veya Rules kontrol edin`);
+          return false;
+        }
+
+        const data = await res.json();
+        if (data && typeof data === "object") {
+          const remoteProgress = data.progress && typeof data.progress === "object" ? data.progress : data;
+          const cleanProgress = {};
+          Object.entries(remoteProgress).forEach(([k, v]) => {
+            if (v === "watched" || v === "watching") cleanProgress[String(k)] = v;
+          });
+          progressMap = cleanProgress;
+          saveLocalState();
+          renderApp();
+        }
+
+        const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+        setCloudUI("ready", `Firebase eşitlendi (${nowStr})`);
+        if (!silent) showToast("Firebase'den güncel Bond listesi çekildi.");
+        return true;
+      } catch {
+        setCloudUI("unconfigured", "Firebase bağlantı hatası");
+        return false;
+      }
+    }
+
+    async function pushToFirebase() {
+      const endpoint = getFirebaseEndpoint();
+      if (!endpoint) return false;
+      setCloudUI("syncing", "Firebase'e kaydediliyor...");
+
+      try {
+        const payload = {
+          updatedAt: new Date().toISOString(),
+          watchedCount: Object.values(progressMap).filter(v => v === "watched").length,
+          progress: progressMap
+        };
+
+        const res = await fetch(endpoint, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          setCloudUI("unconfigured", `Firebase yazma hatası (${res.status}) — Rules kontrol edin`);
+          return false;
+        }
+
+        const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+        setCloudUI("ready", `Firebase'e kaydedildi (${nowStr})`);
+        return true;
+      } catch {
+        setCloudUI("unconfigured", "Firebase kayıt hatası");
+        return false;
+      }
+    }
+
+    function scheduleFirebasePush() {
+      if (!getFirebaseEndpoint()) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => { pushToFirebase(); }, 400);
+    }
+
+    async function manualSyncNow() {
+      if (!getFirebaseEndpoint()) {
+        showToast("Önce kod içindeki EMBEDDED_FIREBASE_CONFIG.databaseUrl alanını doldurun.");
+        return;
+      }
+      const icon = document.getElementById("syncIcon");
+      icon.classList.add("animate-spin");
+      await pullFromFirebase(false);
+      icon.classList.remove("animate-spin");
+    }
+
+    function createFallbackPosterDataUri(item) {
+      const title = item.ad.length > 26 ? item.ad.slice(0, 24) + "…" : item.ad;
+      const num = String(item.sira).padStart(2, "0");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1f1b10"/>
+            <stop offset="100%" stop-color="#09090b"/>
+          </linearGradient>
+        </defs>
+        <rect width="200" height="300" fill="url(#g)"/>
+        <rect x="8" y="8" width="184" height="284" rx="10" fill="none" stroke="#d4af37" stroke-opacity="0.45" stroke-width="1.5"/>
+        <rect x="16" y="16" width="44" height="22" rx="4" fill="#d4af37"/>
+        <text x="38" y="31" fill="#09090b" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">#${num}</text>
+        <text x="100" y="132" fill="#d4af37" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="3">007</text>
+        <text x="100" y="158" fill="#f4f4f5" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">${escapeXml(title)}</text>
+        <text x="100" y="184" fill="#a1a1aa" font-family="sans-serif" font-size="11" text-anchor="middle">${item.yil} • ${escapeXml(item.aktor)}</text>
+      </svg>`;
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    function escapeXml(unsafe) {
+      return unsafe.replace(/[<>&'"]/g, c => ({
+        "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;"
+      }[c]));
+    }
+
+    async function fetchWikipediaPoster(item) {
+      if (posterCache[item.orijinal_ad]) return posterCache[item.orijinal_ad];
+      const wikiQueries = [
+        `${item.orijinal_ad} (film)`,
+        item.orijinal_ad
+      ];
+      for (const q of wikiQueries) {
+        try {
+          const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data && data.thumbnail && data.thumbnail.source) {
+            posterCache[item.orijinal_ad] = data.thumbnail.source;
+            localStorage.setItem(POSTER_CACHE_KEY, JSON.stringify(posterCache));
+            return data.thumbnail.source;
+          }
+        } catch {}
+      }
+      return null;
+    }
+
+    function renderApp() {
+      updateStatsAndUpNext();
+      renderSections();
+    }
+
+    function updateStatsAndUpNext() {
+      const total = BOND_FILMS.length;
+      let watched = 0;
+      let watching = 0;
+
+      BOND_FILMS.forEach(item => {
+        const st = getStatus(item.id);
+        if (st === "watched") watched++;
+        else if (st === "watching") watching++;
+      });
+
+      const unwatched = total - watched - watching;
+      const pct = Math.round((watched / total) * 100);
+
+      document.getElementById("statsSummaryText").textContent =
+        `${total} film | ${watched} izlendi | ${watching} izleniyor | ${unwatched} izlenmedi`;
+      document.getElementById("progressPercentText").textContent = `%${pct}`;
+      document.getElementById("mainProgressBar").style.width = `${pct}%`;
+
+      const nextItem =
+        BOND_FILMS.find(i => getStatus(i.id) === "watching") ||
+        BOND_FILMS.find(i => getStatus(i.id) === "unwatched") ||
+        BOND_FILMS[BOND_FILMS.length - 1];
+
+      const numStr = String(nextItem.sira).padStart(2, "0");
+      document.getElementById("upNextTitle").textContent = `${numStr} — ${nextItem.ad}`;
+      document.getElementById("upNextMeta").textContent =
+        `🤵 ${nextItem.aktor} • ${nextItem.yil} • ★ ${nextItem.imdb} IMDb`;
+      document.getElementById("upNextDesc").textContent = nextItem.aciklama;
+
+      const upPoster = document.getElementById("upNextPoster");
+      upPoster.src = posterCache[nextItem.orijinal_ad] || createFallbackPosterDataUri(nextItem);
+      upPoster.dataset.itemId = nextItem.id;
+      if (!posterCache[nextItem.orijinal_ad]) {
+        fetchWikipediaPoster(nextItem).then(url => {
+          if (url && upPoster.dataset.itemId === String(nextItem.id)) upPoster.src = url;
+        });
+      }
+    }
+
+    function getFilteredItems() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const statusF = document.getElementById("statusFilter").value;
+      const actorF = document.getElementById("actorFilter").value;
+
+      return BOND_FILMS.filter(item => {
+        const st = getStatus(item.id);
+        if (statusF !== "all" && st !== statusF) return false;
+        if (actorF !== "all" && item.aktor !== actorF) return false;
+        if (query) {
+          const hay = `${item.ad} ${item.orijinal_ad} ${item.aciklama} ${item.yil} ${item.aktor}`.toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderSections() {
+      const container = document.getElementById("sectionsContainer");
+      const filtered = getFilteredItems();
+      document.getElementById("filterResultInfo").textContent = `Toplam ${filtered.length} / ${BOND_FILMS.length} film gösteriliyor`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-10 text-center space-y-2">
+            <p class="text-zinc-300 font-semibold">Aramanıza veya filtrelerinize uygun Bond filmi bulunamadı.</p>
+            <button onclick="clearFilters()" class="px-4 py-2 rounded-xl bg-[#d4af37] text-zinc-950 text-xs font-bold cursor-pointer">
+              Filtreleri Sıfırla
+            </button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+
+      ERA_ORDER.forEach(eraName => {
+        const allInEra = BOND_FILMS.filter(i => i.donem === eraName);
+        const visibleInEra = filtered.filter(i => i.donem === eraName);
+        if (visibleInEra.length === 0) return;
+
+        const watchedInEra = allInEra.filter(i => getStatus(i.id) === "watched").length;
+        const eraPct = Math.round((watchedInEra / allInEra.length) * 100);
+        const isOpen = openSections[eraName] !== false;
+
+        const sectionEl = document.createElement("div");
+        sectionEl.className = "rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden";
+
+        sectionEl.innerHTML = `
+          <button onclick="toggleSection('${eraName.replace(/'/g, "\\'")}')"
+            class="w-full px-4 sm:px-5 py-3.5 bg-zinc-900/90 hover:bg-zinc-900 flex flex-wrap items-center justify-between gap-3 text-left transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}">▶</span>
+              <h3 class="font-display text-base sm:text-lg font-bold text-white uppercase tracking-wide">${eraName}</h3>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold ${watchedInEra === allInEra.length ? "text-emerald-400" : "text-zinc-300"}">
+                ${watchedInEra}/${allInEra.length} izlendi
+              </span>
+              <div class="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="h-full ${watchedInEra === allInEra.length ? "bg-emerald-500" : "bg-[#d4af37]"}" style="width: ${eraPct}%"></div>
+              </div>
+            </div>
+          </button>
+          <div class="${isOpen ? "block" : "hidden"} p-3 sm:p-4 space-y-2.5 border-t border-zinc-800/80">
+            ${visibleInEra.map(item => renderItemCardHTML(item)).join("")}
+          </div>
+        `;
+
+        container.appendChild(sectionEl);
+      });
+
+      visiblePosterHydration(filtered);
+    }
+
+    function renderItemCardHTML(item) {
+      const st = getStatus(item.id);
+      const numStr = String(item.sira).padStart(2, "0");
+      const cardClass = st === "watched" ? "card-watched" : st === "watching" ? "card-watching" : "card-unwatched";
+      const posterSrc = posterCache[item.orijinal_ad] || createFallbackPosterDataUri(item);
+      const imdbUrl = `https://www.imdb.com/title/${item.imdb_id}/`;
+
+      return `
+        <div id="item-card-${item.id}" class="${cardClass} rounded-xl border p-3 sm:p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+            <div class="relative shrink-0">
+              <img id="poster-${item.id}" src="${posterSrc}" alt="${item.ad}" loading="lazy"
+                class="w-12 h-[72px] sm:w-14 sm:h-[84px] rounded-lg object-cover border border-zinc-700/80 bg-zinc-950" />
+              <span class="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-700 text-[10px] font-bold text-zinc-200">
+                ${numStr}
+              </span>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-sm sm:text-base text-white leading-snug ${st === "watched" ? "line-through decoration-emerald-500/60 text-zinc-300" : ""}">
+                  ${numStr} — ${item.ad}
+                </span>
+                ${st === "watched" ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">✓ İzlendi</span>` : ""}
+              </div>
+
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-400 mt-1">
+                <span>🤵 ${item.aktor}</span>
+                <span>•</span>
+                <span>${item.yil}</span>
+                <span>•</span>
+                <span class="text-zinc-400 italic">${item.orijinal_ad}</span>
+                <span>•</span>
+                <span class="inline-flex items-center gap-1 text-amber-400 font-semibold">★ ${item.imdb}</span>
+                <a href="${imdbUrl}" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition">
+                  IMDb ↗
+                </a>
+              </div>
+
+              <p class="text-xs text-zinc-400 mt-1.5 line-clamp-2">${item.aciklama}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/70">
+            <select onchange="setStatus(${item.id}, this.value)" aria-label="İzleme durumu"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer focus:outline-none ${getSelectStyle(st)}">
+              <option value="unwatched" ${st === "unwatched" ? "selected" : ""}>🔴 İzlenmedi</option>
+              <option value="watching" ${st === "watching" ? "selected" : ""}>🟡 İzleniyor</option>
+              <option value="watched" ${st === "watched" ? "selected" : ""}>🟢 İzlendi</option>
+            </select>
+          </div>
+        </div>
+      `;
+    }
+
+    function getSelectStyle(status) {
+      if (status === "watched") return "bg-emerald-950/70 border-emerald-700/70 text-emerald-300";
+      if (status === "watching") return "bg-amber-950/70 border-amber-700/70 text-amber-300";
+      return "bg-zinc-950 border-zinc-700 text-zinc-200 hover:border-zinc-500";
+    }
+
+    function visiblePosterHydration(items) {
+      items.forEach(item => {
+        if (!posterCache[item.orijinal_ad]) {
+          fetchWikipediaPoster(item).then(url => {
+            if (url) {
+              const imgEl = document.getElementById(`poster-${item.id}`);
+              if (imgEl) imgEl.src = url;
+            }
+          });
+        }
+      });
+    }
+
+    function toggleSection(eraName) {
+      openSections[eraName] = openSections[eraName] === false ? true : false;
+      renderSections();
+    }
+
+    function expandAllSections(expand) {
+      ERA_ORDER.forEach(e => { openSections[e] = expand; });
+      renderSections();
+    }
+
+    function applyFilters() {
+      renderSections();
+    }
+
+    function clearFilters() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("statusFilter").value = "all";
+      document.getElementById("actorFilter").value = "all";
+      renderSections();
+    }
+
+    function scrollToUpNext() {
+      const nextItem =
+        BOND_FILMS.find(i => getStatus(i.id) === "watching") ||
+        BOND_FILMS.find(i => getStatus(i.id) === "unwatched") ||
+        BOND_FILMS[0];
+
+      openSections[nextItem.donem] = true;
+      clearFilters();
+
+      setTimeout(() => {
+        const el = document.getElementById(`item-card-${nextItem.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.classList.add("ring-2", "ring-[#d4af37]");
+          setTimeout(() => el.classList.remove("ring-2", "ring-[#d4af37]"), 2000);
+        }
+      }, 80);
+    }
+
+    function markUpNextAsWatched() {
+      const nextItem =
+        BOND_FILMS.find(i => getStatus(i.id) === "watching") ||
+        BOND_FILMS.find(i => getStatus(i.id) === "unwatched");
+
+      if (!nextItem) {
+        showToast("Tebrikler! Tüm 25 James Bond filmi izlendi.");
+        return;
+      }
+      setStatus(nextItem.id, "watched");
+      showToast(`"${nextItem.ad}" izlendi olarak işaretlendi!`);
+    }
+
+    function resetAllProgress() {
+      if (!confirm("Tüm 007 izleme ilerlemeniz sıfırlanacak ve tüm filmler 'İzlenmedi' yapılacak. Emin misiniz?")) return;
+      progressMap = {};
+      saveLocalState();
+      renderApp();
+      scheduleFirebasePush();
+      showToast("Tüm izleme ilerlemesi sıfırlandı.");
+    }
+
+    function exportJSON() {
+      const dataStr = JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        progress: progressMap
+      }, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `james-bond-izleme-yedek-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("007 izleme listesi JSON olarak indirildi.");
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const imported = parsed.progress || parsed;
+          if (typeof imported !== "object") throw new Error("Geçersiz format");
+          progressMap = imported;
+          saveLocalState();
+          renderApp();
+          scheduleFirebasePush();
+          showToast("JSON yedeği başarıyla geri yüklendi!");
+        } catch {
+          alert("Seçilen JSON dosyası okunamadı veya formatı hatalı.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.add("hidden"), 3000);
+    }
+  </script>
+</body>
+</html>
