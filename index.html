@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marvel İzleme Rehberi — MCU Takip & Bulut Senkronizasyon</title>
+  <title>Marvel İzleme Rehberi — MCU Takip & Firebase Senkronizasyon</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,12 +57,12 @@
             <h1 class="font-display text-lg sm:text-xl font-bold tracking-wide text-white uppercase leading-tight">
               Marvel İzleme Rehberi
             </h1>
-            <p class="text-[11px] text-zinc-400">87 Yapım • Tüm Cihazlarda Otomatik Bulut Kayıt</p>
+            <p class="text-[11px] text-zinc-400">87 Yapım • Firebase Realtime Bulut Kayıt</p>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <button id="btnSyncNow" onclick="manualSyncNow()" title="GitHub ile Şimdi Eşitle"
+          <button id="btnSyncNow" onclick="manualSyncNow()" title="Firebase ile Şimdi Eşitle"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 transition cursor-pointer">
             <span id="cloudDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
             <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,11 +199,13 @@
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-medium text-white shadow-2xl"></div>
 
   <script>
-    const EMBEDDED_CLOUD_CONFIG = {
-      owner: "rizacantire",
-      repo: "mcu-tracker",
-      path: "progress.json",
-      token: "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"
+    // =========================================================================
+    // FIREBASE REALTIME DATABASE URL (SONUNDA SLASH OLMADAN)
+    // Örnek: "https://mcu-tracker-default-rtdb.europe-west1.firebasedatabase.app"
+    // =========================================================================
+    const EMBEDDED_FIREBASE_CONFIG = {
+      databaseUrl: "https://mcu-tracker-b2d6b-default-rtdb.firebaseio.com/",
+      nodePath: "mcu_progress"
     };
 
     const MCU_ITEMS = [
@@ -320,7 +322,6 @@
     let progressMap = {};
     let posterCache = {};
     let openSections = {};
-    let cloudSha = null;
     let syncTimer = null;
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -328,20 +329,19 @@
       SAGA_ORDER.forEach(s => { openSections[s] = true; });
       renderApp();
 
-      if (hasEmbeddedCloud()) {
-        setCloudUI("ready", `Bulut: ${EMBEDDED_CLOUD_CONFIG.owner}/${EMBEDDED_CLOUD_CONFIG.repo}`);
-        await pullFromGitHub(true);
+      if (getFirebaseEndpoint()) {
+        setCloudUI("ready", "Firebase bağlı");
+        await pullFromFirebase(true);
       } else {
-        setCloudUI("unconfigured", "Bulut ayarı eksik");
+        setCloudUI("unconfigured", "databaseUrl girilmedi (yalnızca yerel kayıt)");
       }
     });
 
-    function hasEmbeddedCloud() {
-      return Boolean(
-        EMBEDDED_CLOUD_CONFIG.owner &&
-        EMBEDDED_CLOUD_CONFIG.repo &&
-        EMBEDDED_CLOUD_CONFIG.token
-      );
+    function getFirebaseEndpoint() {
+      const base = (EMBEDDED_FIREBASE_CONFIG.databaseUrl || "").trim().replace(/\/+$/, "");
+      const node = (EMBEDDED_FIREBASE_CONFIG.nodePath || "mcu_progress").trim().replace(/^\/+|\/+$/g, "");
+      if (!base) return "";
+      return `${base}/${node}.json`;
     }
 
     function setCloudUI(stateType, labelText) {
@@ -383,135 +383,89 @@
       else progressMap[key] = newStatus;
       saveLocalState();
       renderApp();
-      scheduleCloudPush();
+      scheduleFirebasePush();
     }
 
-    function encodeBase64Unicode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-
-    function decodeBase64Unicode(str) {
-      return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
-    }
-
-    async function pullFromGitHub(silent = false) {
-      if (!hasEmbeddedCloud()) return false;
-      const { owner, repo, path, token } = EMBEDDED_CLOUD_CONFIG;
-      const filePath = path || "progress.json";
-      setCloudUI("syncing", "Buluttan okunuyor...");
+    async function pullFromFirebase(silent = false) {
+      const endpoint = getFirebaseEndpoint();
+      if (!endpoint) return false;
+      setCloudUI("syncing", "Firebase'den okunuyor...");
 
       try {
-        const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}?t=${Date.now()}`;
-        const res = await fetch(url, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json"
-          }
-        });
-
-        if (res.status === 404) {
-          await pushToGitHub();
-          return true;
-        }
+        const res = await fetch(`${endpoint}?t=${Date.now()}`, { method: "GET" });
         if (!res.ok) {
-          setCloudUI("unconfigured", `Bulut okuma hatası (${res.status}) — token/depo kontrol edin`);
+          setCloudUI("unconfigured", `Firebase okuma hatası (${res.status}) — URL veya Rules kontrol edin`);
           return false;
         }
 
         const data = await res.json();
-        cloudSha = data.sha;
-        const decoded = decodeBase64Unicode(data.content || "e30=");
-        const remoteObj = JSON.parse(decoded || "{}");
-        const remoteProgress = remoteObj.progress || remoteObj;
-
-        if (remoteProgress && typeof remoteProgress === "object") {
-          progressMap = remoteProgress;
+        if (data && typeof data === "object") {
+          const remoteProgress = data.progress && typeof data.progress === "object" ? data.progress : data;
+          const cleanProgress = {};
+          Object.entries(remoteProgress).forEach(([k, v]) => {
+            if (v === "watched" || v === "watching") cleanProgress[String(k)] = v;
+          });
+          progressMap = cleanProgress;
           saveLocalState();
           renderApp();
         }
 
         const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        setCloudUI("ready", `Eşitlendi (${nowStr})`);
-        if (!silent) showToast("GitHub bulutundan güncel liste çekildi.");
+        setCloudUI("ready", `Firebase eşitlendi (${nowStr})`);
+        if (!silent) showToast("Firebase'den güncel izleme listesi çekildi.");
         return true;
       } catch {
-        setCloudUI("unconfigured", "Bulut bağlantı hatası");
+        setCloudUI("unconfigured", "Firebase bağlantı hatası");
         return false;
       }
     }
 
-    async function pushToGitHub() {
-      if (!hasEmbeddedCloud()) return false;
-      const { owner, repo, path, token } = EMBEDDED_CLOUD_CONFIG;
-      const filePath = path || "progress.json";
-      setCloudUI("syncing", "Buluta kaydediliyor...");
+    async function pushToFirebase() {
+      const endpoint = getFirebaseEndpoint();
+      if (!endpoint) return false;
+      setCloudUI("syncing", "Firebase'e kaydediliyor...");
 
       try {
-        const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}`;
-
-        if (!cloudSha) {
-          const checkRes = await fetch(`${url}?t=${Date.now()}`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github+json"
-            }
-          });
-          if (checkRes.ok) {
-            const checkData = await checkRes.json();
-            cloudSha = checkData.sha;
-          }
-        }
-
-        const payloadObj = {
+        const payload = {
           updatedAt: new Date().toISOString(),
           watchedCount: Object.values(progressMap).filter(v => v === "watched").length,
           progress: progressMap
         };
 
-        const body = {
-          message: `MCU ilerleme güncellendi (${new Date().toLocaleString("tr-TR")})`,
-          content: encodeBase64Unicode(JSON.stringify(payloadObj, null, 2))
-        };
-        if (cloudSha) body.sha = cloudSha;
-
-        const res = await fetch(url, {
+        const res = await fetch(endpoint, {
           method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
-          if (res.status === 409) cloudSha = null;
-          setCloudUI("unconfigured", `Buluta yazılamadı (${res.status})`);
+          setCloudUI("unconfigured", `Firebase yazma hatası (${res.status}) — Rules kontrol edin`);
           return false;
         }
 
-        const data = await res.json();
-        if (data.content && data.content.sha) cloudSha = data.content.sha;
         const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        setCloudUI("ready", `Buluta kaydedildi (${nowStr})`);
+        setCloudUI("ready", `Firebase'e kaydedildi (${nowStr})`);
         return true;
       } catch {
-        setCloudUI("unconfigured", "Bulut kayıt hatası");
+        setCloudUI("unconfigured", "Firebase kayıt hatası");
         return false;
       }
     }
 
-    function scheduleCloudPush() {
-      if (!hasEmbeddedCloud()) return;
+    function scheduleFirebasePush() {
+      if (!getFirebaseEndpoint()) return;
       clearTimeout(syncTimer);
-      syncTimer = setTimeout(() => { pushToGitHub(); }, 600);
+      syncTimer = setTimeout(() => { pushToFirebase(); }, 400);
     }
 
     async function manualSyncNow() {
-      if (!hasEmbeddedCloud()) return;
+      if (!getFirebaseEndpoint()) {
+        showToast("Önce kod içindeki EMBEDDED_FIREBASE_CONFIG.databaseUrl alanını doldurun.");
+        return;
+      }
       const icon = document.getElementById("syncIcon");
       icon.classList.add("animate-spin");
-      await pullFromGitHub(false);
+      await pullFromFirebase(false);
       icon.classList.remove("animate-spin");
     }
 
@@ -820,7 +774,7 @@
       progressMap = {};
       saveLocalState();
       renderApp();
-      scheduleCloudPush();
+      scheduleFirebasePush();
       showToast("Tüm izleme ilerlemesi sıfırlandı.");
     }
 
@@ -851,7 +805,7 @@
           progressMap = imported;
           saveLocalState();
           renderApp();
-          scheduleCloudPush();
+          scheduleFirebasePush();
           showToast("JSON yedeği başarıyla geri yüklendi!");
         } catch {
           alert("Seçilen JSON dosyası okunamadı veya formatı hatalı.");
