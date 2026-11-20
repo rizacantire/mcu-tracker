@@ -13,8 +13,6 @@
       --marvel-red: #e62429;
       --marvel-red-dark: #b81418;
       --bg-base: #09090b;
-      --bg-card: #121216;
-      --bg-elevated: #18181d;
     }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -48,11 +46,9 @@
 </head>
 <body class="min-h-screen antialiased selection:bg-[#e62429] selection:text-white">
 
-  <!-- ÜST BAŞLIK VE ÖZET PANELİ -->
   <header class="sticky top-0 z-30 border-b border-zinc-800/90 bg-zinc-950/90 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-4 py-3.5">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Marka -->
         <div class="flex items-center gap-3">
           <div class="px-2.5 py-1 bg-[#e62429] text-white font-display font-bold text-xl tracking-wider uppercase rounded shadow-lg shadow-red-950/50 select-none">
             MCU
@@ -61,24 +57,18 @@
             <h1 class="font-display text-lg sm:text-xl font-bold tracking-wide text-white uppercase leading-tight">
               Marvel İzleme Rehberi
             </h1>
-            <p class="text-[11px] text-zinc-400">87 Yapım • Kronolojik / Yayın İlerleme Takibi</p>
+            <p class="text-[11px] text-zinc-400">87 Yapım • Tüm Cihazlarda Otomatik Bulut Kayıt</p>
           </div>
         </div>
 
-        <!-- Bulut & Veri Araçları -->
         <div class="flex flex-wrap items-center gap-2">
-          <button id="btnCloudModal" onclick="openCloudModal()"
-            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-200">
-            <span id="cloudDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
-            <span id="cloudBtnText">GitHub Bulut Ayarı</span>
-          </button>
-
           <button id="btnSyncNow" onclick="manualSyncNow()" title="GitHub ile Şimdi Eşitle"
-            class="hidden inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 transition cursor-pointer">
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 transition cursor-pointer">
+            <span id="cloudDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
             <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span>Eşitle</span>
+            <span>Şimdi Eşitle</span>
           </button>
 
           <button onclick="exportJSON()" title="JSON Yedek İndir"
@@ -99,14 +89,13 @@
         </div>
       </div>
 
-      <!-- İlerleme Özeti & Progress Bar -->
       <div class="mt-3 pt-3 border-t border-zinc-800/80">
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs mb-1.5">
           <div id="statsSummaryText" class="font-medium text-zinc-300">
             87 yapım | 0 izlendi | 0 izleniyor | 87 izlenmedi
           </div>
           <div class="flex items-center gap-3">
-            <span id="cloudStatusLabel" class="text-[11px] text-zinc-500">Yerel kayıt aktif</span>
+            <span id="cloudStatusLabel" class="text-[11px] text-zinc-400">Başlatılıyor...</span>
             <span id="progressPercentText" class="font-bold text-sm text-[#e62429]">%0</span>
           </div>
         </div>
@@ -118,8 +107,6 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-
-    <!-- SIRADAKİ YAPIM KARTI -->
     <section id="upNextSection" class="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-red-950/20 p-4 sm:p-5 shadow-xl">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="flex items-center gap-4">
@@ -134,11 +121,11 @@
           </div>
         </div>
         <div class="flex flex-wrap sm:flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto shrink-0">
-          <button id="btnContinueWatching" onclick="scrollToUpNext()"
+          <button onclick="scrollToUpNext()"
             class="px-4 py-2 rounded-xl bg-[#e62429] hover:bg-[#b81418] text-white text-xs font-bold tracking-wide transition shadow-lg shadow-red-950/40 cursor-pointer">
             İzlemeye Devam Et
           </button>
-          <button id="btnMarkUpNextWatched" onclick="markUpNextAsWatched()"
+          <button onclick="markUpNextAsWatched()"
             class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-emerald-600/20 border border-zinc-700 hover:border-emerald-500/50 text-zinc-200 hover:text-emerald-300 text-xs font-semibold transition cursor-pointer">
             🟢 İzlendi İşaretle
           </button>
@@ -146,10 +133,8 @@
       </div>
     </section>
 
-    <!-- FİLTRE VE ARAMA ÇUBUĞU -->
     <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-        <!-- Arama -->
         <div class="md:col-span-5 relative">
           <input type="text" id="searchInput" oninput="applyFilters()"
             placeholder="Film, dizi veya karakter ara (örn. Iron Man, Loki, Daredevil)..."
@@ -159,7 +144,6 @@
           </svg>
         </div>
 
-        <!-- Durum Filtresi -->
         <div class="md:col-span-3">
           <select id="statusFilter" onchange="applyFilters()"
             class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
@@ -170,7 +154,6 @@
           </select>
         </div>
 
-        <!-- Tür Filtresi -->
         <div class="md:col-span-2">
           <select id="typeFilter" onchange="applyFilters()"
             class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
@@ -182,7 +165,6 @@
           </select>
         </div>
 
-        <!-- Dönem Filtresi -->
         <div class="md:col-span-2">
           <select id="phaseFilter" onchange="applyFilters()"
             class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#e62429] focus:outline-none text-sm text-zinc-200">
@@ -211,77 +193,26 @@
       </div>
     </section>
 
-    <!-- BÖLÜMLERE AYRILMIŞ YAPIM LİSTESİ -->
     <div id="sectionsContainer" class="space-y-4"></div>
-
   </main>
 
-  <!-- GITHUB BULUT AYARI MODALI -->
-  <div id="cloudModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-        <div>
-          <h3 class="text-base font-bold text-white">GitHub Bulut Senkronizasyonu</h3>
-          <p class="text-xs text-zinc-400">Deponuzdaki <code class="text-zinc-200">progress.json</code> dosyasına otomatik kayıt</p>
-        </div>
-        <button onclick="closeCloudModal()" class="text-zinc-400 hover:text-white text-lg px-2 cursor-pointer">✕</button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-zinc-300 font-medium mb-1">GitHub Kullanıcı Adı</label>
-          <input type="text" id="ghOwner" placeholder="örnek: kullaniciadiniz"
-            class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-zinc-300 font-medium mb-1">Depo (Repository) Adı</label>
-            <input type="text" id="ghRepo" placeholder="örnek: mcu-tracker"
-              class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
-          </div>
-          <div>
-            <label class="block text-zinc-300 font-medium mb-1">Dosya Yolu</label>
-            <input type="text" id="ghPath" value="progress.json"
-              class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-zinc-300 font-medium mb-1">Fine-Grained Personal Access Token</label>
-          <input type="password" id="ghToken" placeholder="github_pat_..."
-            class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white focus:border-[#e62429] focus:outline-none" />
-          <p class="text-[11px] text-zinc-500 mt-1">
-            Sadece bu depo için <strong>Contents: Read and write</strong> yetkisi verilmiş token girin. Token yalnızca bu cihazın tarayıcısında saklanır.
-          </p>
-        </div>
-      </div>
-
-      <div id="cloudModalMsg" class="hidden text-xs p-2.5 rounded-lg border"></div>
-
-      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800">
-        <button onclick="disconnectCloud()" class="px-3 py-2 rounded-lg text-xs text-zinc-400 hover:text-red-400 transition cursor-pointer">
-          Bağlantıyı Kes
-        </button>
-        <div class="flex items-center gap-2">
-          <button onclick="closeCloudModal()" class="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium cursor-pointer">
-            İptal
-          </button>
-          <button onclick="saveAndTestCloudConfig()" class="px-4 py-2 rounded-lg bg-[#e62429] hover:bg-[#b81418] text-white text-xs font-bold cursor-pointer">
-            Bağlan & Kaydet
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST BİLDİRİM -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-medium text-white shadow-2xl"></div>
 
   <script>
     // =========================================================================
-    // 1. 87 MADDELİK EKSİKSİZ MARVEL SİNEMATİK EVRENİ (MCU) VERİ SETİ
+    // KENDİ GITHUB BİLGİLERİNİZİ BURAYA YAZIN (HER CİHAZDA OTOMATİK ÇALIŞIR)
+    // =========================================================================
+    const EMBEDDED_CLOUD_CONFIG = {
+      owner: "",                // Örn: "rizacantire"
+      repo: "",                 // Örn: "mcu-tracker"
+      path: "progress.json",    // Depoda okunup yazılacak JSON dosyası
+      token: ""                 // Contents: Read and write yetkili Fine-grained token
+    };
+
+    // =========================================================================
+    // 87 MADDELİK EKSİKSİZ MARVEL SİNEMATİK EVRENİ (MCU) VERİ SETİ
     // =========================================================================
     const MCU_ITEMS = [
-      // BÖLÜM 1: Infinity Saga – Phase 1
       { id: 1, sira: 1, ad: "Iron Man", orijinal_ad: "Iron Man", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "7.9", imdb_id: "tt0371746", aciklama: "Tony Stark'ın zırhını inşa edip MCU evrenini başlattığı ilk film." },
       { id: 2, sira: 2, ad: "The Incredible Hulk", orijinal_ad: "The Incredible Hulk", yil: 2008, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.6", imdb_id: "tt0800080", aciklama: "Bruce Banner'ın gama radyasyonu sonrası Hulk'a dönüşüm mücadelesi." },
       { id: 3, sira: 3, ad: "Iron Man 2", orijinal_ad: "Iron Man 2", yil: 2010, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.9", imdb_id: "tt1228705", aciklama: "Tony Stark, Ivan Vanko ve Black Widow'un ilk kez sahneye çıkışı." },
@@ -293,7 +224,6 @@
       { id: 9, sira: 9, ad: "The Avengers (Yenilmezler)", orijinal_ad: "The Avengers", yil: 2012, tur: "Film", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "8.0", imdb_id: "tt0848228", aciklama: "Loki ve Chitauri istilasına karşı ilk büyük Avengers birleşmesi." },
       { id: 10, sira: 10, ad: "Marvel One-Shot: Item 47", orijinal_ad: "Marvel One-Shot: Item 47", yil: 2012, tur: "Özel Yapım", phase: "Phase 1", saga: "Infinity Saga – Phase 1", imdb: "6.7", imdb_id: "tt2247732", aciklama: "New York savaşı sonrası Chitauri silahı bulan bir çiftin hikayesi." },
 
-      // BÖLÜM 2: Infinity Saga – Phase 2
       { id: 11, sira: 11, ad: "Iron Man 3", orijinal_ad: "Iron Man 3", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.1", imdb_id: "tt1300854", aciklama: "New York travması yaşayan Tony Stark'ın Mandarin ile yüzleşmesi." },
       { id: 12, sira: 12, ad: "Marvel One-Shot: All Hail the King", orijinal_ad: "Marvel One-Shot: All Hail the King", yil: 2014, tur: "Özel Yapım", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.3", imdb_id: "tt3438640", aciklama: "Hapishanedeki Trevor Slattery ile yapılan gizemli röportaj." },
       { id: 13, sira: 13, ad: "Thor: Karanlık Dünya", orijinal_ad: "Thor: The Dark World", yil: 2013, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "6.7", imdb_id: "tt1981115", aciklama: "Kara Elfler, Malekith ve Gerçeklik Taşı (Aether) tehdidi." },
@@ -306,7 +236,6 @@
       { id: 20, sira: 20, ad: "Avengers: Ultron Çağı", orijinal_ad: "Avengers: Age of Ultron", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.3", imdb_id: "tt2395427", aciklama: "Ultron'un doğuşu, Sokovia savaşı ve Vision'ın ekibe katılışı." },
       { id: 21, sira: 21, ad: "Ant-Man", orijinal_ad: "Ant-Man", yil: 2015, tur: "Film", phase: "Phase 2", saga: "Infinity Saga – Phase 2", imdb: "7.2", imdb_id: "tt0478970", aciklama: "Scott Lang'in Hank Pym'den küçülme teknolojisini devralması." },
 
-      // BÖLÜM 3: Defenders Saga
       { id: 22, sira: 22, ad: "Daredevil (1. Sezon)", orijinal_ad: "Daredevil Season 1", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.6", imdb_id: "tt3322312", aciklama: "Matt Murdock'un Hell's Kitchen'da Wilson Fisk'e karşı savaşı." },
       { id: 23, sira: 23, ad: "Jessica Jones (1. Sezon)", orijinal_ad: "Jessica Jones Season 1", yil: 2015, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.9", imdb_id: "tt2357547", aciklama: "Özel dedektif Jessica Jones'un zihin kontrolcüsü Kilgrave ile hesabı." },
       { id: 24, sira: 24, ad: "Daredevil (2. Sezon)", orijinal_ad: "Daredevil Season 2", yil: 2016, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.6", imdb_id: "tt3322312", aciklama: "Punisher ve Elektra'nın Hell's Kitchen sahnesine girişi." },
@@ -321,7 +250,6 @@
       { id: 33, sira: 33, ad: "The Punisher (2. Sezon)", orijinal_ad: "The Punisher Season 2", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "8.4", imdb_id: "tt5675620", aciklama: "Frank Castle'ın genç bir kızı korurken Billy Russo ile yüzleşmesi." },
       { id: 34, sira: 34, ad: "Jessica Jones (3. Sezon)", orijinal_ad: "Jessica Jones Season 3", yil: 2019, tur: "Dizi", phase: "Defenders Saga", saga: "Defenders Saga", imdb: "7.8", imdb_id: "tt2357547", aciklama: "Jessica ve Trish Walker'ın zeki bir seri katille mücadelesi." },
 
-      // BÖLÜM 4: Infinity Saga – Phase 3
       { id: 35, sira: 35, ad: "Captain America: Kahramanların Savaşı", orijinal_ad: "Captain America: Civil War", yil: 2016, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.8", imdb_id: "tt3498820", aciklama: "Sokovia Anlaşmaları yüzünden Avengers'ın ikiye bölünmesi." },
       { id: 36, sira: 36, ad: "Black Widow", orijinal_ad: "Black Widow", yil: 2021, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "6.6", imdb_id: "tt3480822", aciklama: "Natasha Romanoff'un Kızıl Oda geçmişi ve Yelena Belova ile buluşması." },
       { id: 37, sira: 37, ad: "Black Panther", orijinal_ad: "Black Panther", yil: 2018, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.3", imdb_id: "tt1825683", aciklama: "T'Challa'nın Wakanda kralı oluşu ve Erik Killmonger meydan okuması." },
@@ -334,7 +262,6 @@
       { id: 44, sira: 44, ad: "Avengers: Endgame", orijinal_ad: "Avengers: Endgame", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "8.4", imdb_id: "tt4154796", aciklama: "Zaman soygunu ve Sonsuzluk Destanı'nın epik final savaşı." },
       { id: 45, sira: 45, ad: "Spider-Man: Evden Uzakta", orijinal_ad: "Spider-Man: Far From Home", yil: 2019, tur: "Film", phase: "Phase 3", saga: "Infinity Saga – Phase 3", imdb: "7.4", imdb_id: "tt6320628", aciklama: "Endgame sonrası Avrupa gezisinde Peter Parker ve Mysterio." },
 
-      // BÖLÜM 5: Multiverse Saga – Phase 4
       { id: 46, sira: 46, ad: "WandaVision", orijinal_ad: "WandaVision", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.9", imdb_id: "tt9140560", aciklama: "Westview kasabasında sitcom gerçekliği ve Scarlet Witch'in doğuşu." },
       { id: 47, sira: 47, ad: "The Falcon and the Winter Soldier", orijinal_ad: "The Falcon and the Winter Soldier", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "7.1", imdb_id: "tt9208876", aciklama: "Sam Wilson'ın Kaptan Amerika kalkanını üstlenme yolculuğu." },
       { id: 48, sira: 48, ad: "Loki (1. Sezon)", orijinal_ad: "Loki Season 1", yil: 2021, tur: "Dizi", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "8.2", imdb_id: "tt9140554", aciklama: "TVA (Zaman Değişimi Otoritesi) ve Çoklu Evren dallanmasının başlangıcı." },
@@ -353,7 +280,6 @@
       { id: 61, sira: 61, ad: "Black Panther: Yaşasın Wakanda", orijinal_ad: "Black Panther: Wakanda Forever", yil: 2022, tur: "Film", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.7", imdb_id: "tt9114286", aciklama: "T'Challa'nın vedası ve Talokan kralı Namor ile çatışma." },
       { id: 62, sira: 62, ad: "Galaksinin Koruyucuları: Tatil Özel", orijinal_ad: "The Guardians of the Galaxy Holiday Special", yil: 2022, tur: "Özel Yapım", phase: "Phase 4", saga: "Multiverse Saga – Phase 4", imdb: "6.9", imdb_id: "tt13623136", aciklama: "Drax ve Mantis'in Peter Quill için Kevin Bacon'ı kaçırma planı." },
 
-      // BÖLÜM 6: Multiverse Saga – Phase 5
       { id: 63, sira: 63, ad: "Ant-Man ve Wasp: Quantumania", orijinal_ad: "Ant-Man and the Wasp: Quantumania", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.0", imdb_id: "tt10954600", aciklama: "Kuantum Aleminde Fatih Kang ile ilk büyük karşılaşma." },
       { id: 64, sira: 64, ad: "Galaksinin Koruyucuları 3", orijinal_ad: "Guardians of the Galaxy Vol. 3", yil: 2023, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.9", imdb_id: "tt6791350", aciklama: "Rocket'ın geçmişi ve Yüksek Evrimci'ye karşı son ekip görevi." },
       { id: 65, sira: 65, ad: "Secret Invasion", orijinal_ad: "Secret Invasion", yil: 2023, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "5.9", imdb_id: "tt13157618", aciklama: "Nick Fury'nin Dünya'ya sızan asi Skrull grubunu durdurma çabası." },
@@ -371,7 +297,6 @@
       { id: 77, sira: 77, ad: "Thunderbolts*", orijinal_ad: "Thunderbolts*", yil: 2025, tur: "Film", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "7.2", imdb_id: "tt20969586", aciklama: "Yelena, Bucky, Red Guardian ve anti-kahramanların gizli görevi." },
       { id: 78, sira: 78, ad: "Ironheart", orijinal_ad: "Ironheart", yil: 2025, tur: "Dizi", phase: "Phase 5", saga: "Multiverse Saga – Phase 5", imdb: "6.1", imdb_id: "tt13623126", aciklama: "Riri Williams'ın teknoloji ile büyü (The Hood) arasındaki mücadelesi." },
 
-      // BÖLÜM 7: Multiverse Saga – Phase 6
       { id: 79, sira: 79, ad: "The Fantastic Four: First Steps", orijinal_ad: "The Fantastic Four: First Steps", yil: 2025, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.3", imdb_id: "tt10676052", aciklama: "Retro-fütüristik 1960'lar dünyasında Fantastik Dörtlü ve Galactus." },
       { id: 80, sira: 80, ad: "Eyes of Wakanda", orijinal_ad: "Eyes of Wakanda", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.1", imdb_id: "tt30406305", aciklama: "Tarih boyunca vibranyum eserlerini koruyan Wakanda savaşçıları." },
       { id: 81, sira: 81, ad: "Marvel Zombies", orijinal_ad: "Marvel Zombies", yil: 2025, tur: "Animasyon", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.2", imdb_id: "tt16027014", aciklama: "Zombi kıyametine sürüklenen alternatif evrende hayatta kalma savaşı." },
@@ -380,7 +305,6 @@
       { id: 84, sira: 84, ad: "Spider-Man: Brand New Day", orijinal_ad: "Spider-Man: Brand New Day", yil: 2026, tur: "Film", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.8", imdb_id: "tt22084616", aciklama: "Kimliği unutulan Peter Parker'ın sokak seviyesindeki yeni başlangıcı." },
       { id: 85, sira: 85, ad: "Vision Quest", orijinal_ad: "Vision Quest", yil: 2026, tur: "Dizi", phase: "Phase 6", saga: "Multiverse Saga – Phase 6", imdb: "7.1", imdb_id: "tt23112594", aciklama: "Beyaz Vision'ın anılarını ve kimliğini yeniden inşa etme yolculuğu." },
 
-      // BÖLÜM 8: Gelecek Avengers filmleri
       { id: 86, sira: 86, ad: "Avengers: Doomsday", orijinal_ad: "Avengers: Doomsday", yil: 2026, tur: "Film", phase: "Gelecek Avengers", saga: "Gelecek Avengers filmleri", imdb: "—", imdb_id: "tt21357150", aciklama: "Doctor Doom tehdidine karşı çoklu evren kahramanlarının büyük birleşmesi." },
       { id: 87, sira: 87, ad: "Avengers: Secret Wars", orijinal_ad: "Avengers: Secret Wars", yil: 2027, tur: "Film", phase: "Gelecek Avengers", saga: "Gelecek Avengers filmleri", imdb: "—", imdb_id: "tt21361444", aciklama: "Multiverse Saga'nın zirvesi ve Battleworld hesaplaşması." }
     ];
@@ -398,40 +322,57 @@
 
     const STORAGE_KEY = "mcu_watch_progress_v1";
     const POSTER_CACHE_KEY = "mcu_poster_cache_v1";
-    const CLOUD_CFG_KEY = "mcu_github_cloud_cfg_v1";
 
-    let progressMap = {}; // { "1": "watched", "2": "watching", ... }
-    let posterCache = {}; // { "Iron Man": "https://..." }
-    let openSections = {}; // { "Infinity Saga – Phase 1": true }
+    let progressMap = {};
+    let posterCache = {};
+    let openSections = {};
     let cloudSha = null;
     let syncTimer = null;
 
-    // =========================================================================
-    // 2. BAŞLATMA VE YEREL VERİ YÖNETİMİ
-    // =========================================================================
     document.addEventListener("DOMContentLoaded", async () => {
       loadLocalState();
       SAGA_ORDER.forEach(s => { openSections[s] = true; });
       renderApp();
-      updateCloudIndicator();
 
-      // Bulut ayarı varsa açılışta GitHub'dan güncel progress.json çek
-      const cfg = getCloudConfig();
-      if (cfg && cfg.owner && cfg.repo && cfg.token) {
+      if (hasEmbeddedCloud()) {
+        setCloudUI("ready", `Bulut: ${EMBEDDED_CLOUD_CONFIG.owner}/${EMBEDDED_CLOUD_CONFIG.repo}`);
         await pullFromGitHub(true);
+      } else {
+        setCloudUI("unconfigured", "Kod içinde owner/repo/token girilmedi (yalnızca yerel kayıt)");
       }
     });
+
+    function hasEmbeddedCloud() {
+      return Boolean(
+        EMBEDDED_CLOUD_CONFIG.owner &&
+        EMBEDDED_CLOUD_CONFIG.repo &&
+        EMBEDDED_CLOUD_CONFIG.token
+      );
+    }
+
+    function setCloudUI(stateType, labelText) {
+      const dot = document.getElementById("cloudDot");
+      const label = document.getElementById("cloudStatusLabel");
+      label.textContent = labelText;
+      if (stateType === "ready") {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+      } else if (stateType === "syncing") {
+        dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-zinc-500";
+      }
+    }
 
     function loadLocalState() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) progressMap = JSON.parse(saved) || {};
-      } catch (e) { progressMap = {}; }
+      } catch { progressMap = {}; }
 
       try {
         const cachedPosters = localStorage.getItem(POSTER_CACHE_KEY);
         if (cachedPosters) posterCache = JSON.parse(cachedPosters) || {};
-      } catch (e) { posterCache = {}; }
+      } catch { posterCache = {}; }
     }
 
     function saveLocalState() {
@@ -444,119 +385,11 @@
 
     function setStatus(id, newStatus) {
       const key = String(id);
-      if (newStatus === "unwatched") {
-        delete progressMap[key];
-      } else {
-        progressMap[key] = newStatus;
-      }
+      if (newStatus === "unwatched") delete progressMap[key];
+      else progressMap[key] = newStatus;
       saveLocalState();
       renderApp();
       scheduleCloudPush();
-    }
-
-    // =========================================================================
-    // 3. GITHUB BULUT SENKRONİZASYONU (progress.json OKUMA & YAZMA)
-    // =========================================================================
-    function getCloudConfig() {
-      try {
-        return JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || "null");
-      } catch {
-        return null;
-      }
-    }
-
-    function openCloudModal() {
-      const cfg = getCloudConfig() || {};
-      document.getElementById("ghOwner").value = cfg.owner || "";
-      document.getElementById("ghRepo").value = cfg.repo || "";
-      document.getElementById("ghPath").value = cfg.path || "progress.json";
-      document.getElementById("ghToken").value = cfg.token || "";
-      hideModalMsg();
-      const modal = document.getElementById("cloudModal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-    }
-
-    function closeCloudModal() {
-      const modal = document.getElementById("cloudModal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }
-
-    function showModalMsg(text, isError = false) {
-      const el = document.getElementById("cloudModalMsg");
-      el.textContent = text;
-      el.className = `text-xs p-2.5 rounded-lg border ${isError
-        ? "bg-red-950/60 border-red-800 text-red-200"
-        : "bg-emerald-950/60 border-emerald-800 text-emerald-200"}`;
-      el.classList.remove("hidden");
-    }
-
-    function hideModalMsg() {
-      document.getElementById("cloudModalMsg").classList.add("hidden");
-    }
-
-    function updateCloudIndicator() {
-      const cfg = getCloudConfig();
-      const dot = document.getElementById("cloudDot");
-      const btnText = document.getElementById("cloudBtnText");
-      const syncBtn = document.getElementById("btnSyncNow");
-      const statusLabel = document.getElementById("cloudStatusLabel");
-
-      if (cfg && cfg.owner && cfg.repo && cfg.token) {
-        dot.className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
-        btnText.textContent = `${cfg.repo} (Bağlı)`;
-        syncBtn.classList.remove("hidden");
-        statusLabel.textContent = `Bulut: ${cfg.owner}/${cfg.repo}`;
-      } else {
-        dot.className = "w-2 h-2 rounded-full bg-zinc-500";
-        btnText.textContent = "GitHub Bulut Ayarı";
-        syncBtn.classList.add("hidden");
-        statusLabel.textContent = "Yerel kayıt aktif";
-      }
-    }
-
-    async function saveAndTestCloudConfig() {
-      const owner = document.getElementById("ghOwner").value.trim();
-      const repo = document.getElementById("ghRepo").value.trim();
-      const path = document.getElementById("ghPath").value.trim() || "progress.json";
-      const token = document.getElementById("ghToken").value.trim();
-
-      if (!owner || !repo || !token) {
-        showModalMsg("Lütfen Kullanıcı Adı, Depo Adı ve Token alanlarını doldurun.", true);
-        return;
-      }
-
-      const cfg = { owner, repo, path, token };
-      localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cfg));
-      showModalMsg("GitHub deposuna bağlanılıyor...");
-
-      const pulled = await pullFromGitHub(true);
-      if (pulled === "NOT_FOUND") {
-        // Dosya depoda henüz yoksa mevcut yerel veriyi oluşturarak yaz
-        const pushed = await pushToGitHub();
-        if (pushed) {
-          showModalMsg("Bağlantı başarılı! progress.json dosyası deponuzda oluşturuldu.");
-          updateCloudIndicator();
-          setTimeout(closeCloudModal, 900);
-        } else {
-          showModalMsg("Dosya oluşturulamadı. Token yetkilerini (Contents: Read & Write) kontrol edin.", true);
-        }
-      } else if (pulled === true) {
-        showModalMsg("Bağlantı başarılı! Veriler GitHub ile eşitlendi.");
-        updateCloudIndicator();
-        setTimeout(closeCloudModal, 900);
-      } else {
-        showModalMsg("Bağlantı başarısız. Kullanıcı adı, depo adı veya token bilgisini kontrol edin.", true);
-      }
-    }
-
-    function disconnectCloud() {
-      localStorage.removeItem(CLOUD_CFG_KEY);
-      cloudSha = null;
-      updateCloudIndicator();
-      closeCloudModal();
-      showToast("GitHub bulut bağlantısı kaldırıldı.");
     }
 
     function encodeBase64Unicode(str) {
@@ -568,27 +401,27 @@
     }
 
     async function pullFromGitHub(silent = false) {
-      const cfg = getCloudConfig();
-      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return false;
-
-      const statusLabel = document.getElementById("cloudStatusLabel");
-      statusLabel.textContent = "Buluttan okunuyor...";
+      if (!hasEmbeddedCloud()) return false;
+      const { owner, repo, path, token } = EMBEDDED_CLOUD_CONFIG;
+      const filePath = path || "progress.json";
+      setCloudUI("syncing", "Buluttan okunuyor...");
 
       try {
-        const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path}?t=${Date.now()}`;
+        const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}?t=${Date.now()}`;
         const res = await fetch(url, {
           headers: {
-            "Authorization": `Bearer ${cfg.token}`,
+            "Authorization": `Bearer ${token}`,
             "Accept": "application/vnd.github+json"
           }
         });
 
         if (res.status === 404) {
-          statusLabel.textContent = "progress.json henüz oluşturulmadı";
-          return "NOT_FOUND";
+          // Dosya yoksa mevcut yerel listeyle ilk progress.json dosyasını oluştur
+          await pushToGitHub();
+          return true;
         }
         if (!res.ok) {
-          statusLabel.textContent = "Bulut okuma hatası";
+          setCloudUI("unconfigured", "Bulut okuma hatası (token/depo kontrol edin)");
           return false;
         }
 
@@ -596,44 +429,37 @@
         cloudSha = data.sha;
         const decoded = decodeBase64Unicode(data.content || "e30=");
         const remoteObj = JSON.parse(decoded || "{}");
+        const remoteProgress = remoteObj.progress || remoteObj;
 
-        // Uzak veride kayıt varsa yerel ile birleştir/güncelle
-        if (remoteObj && typeof remoteObj === "object") {
-          const remoteProgress = remoteObj.progress || remoteObj;
-          if (Object.keys(remoteProgress).length > 0 || Object.keys(progressMap).length === 0) {
-            progressMap = remoteProgress;
-            saveLocalState();
-            renderApp();
-          } else if (Object.keys(progressMap).length > 0 && Object.keys(remoteProgress).length === 0) {
-            await pushToGitHub();
-          }
+        if (remoteProgress && typeof remoteProgress === "object") {
+          progressMap = remoteProgress;
+          saveLocalState();
+          renderApp();
         }
 
         const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        statusLabel.textContent = `Eşitlendi (${nowStr})`;
+        setCloudUI("ready", `Eşitlendi (${nowStr})`);
         if (!silent) showToast("GitHub bulutundan güncel liste çekildi.");
         return true;
-      } catch (err) {
-        statusLabel.textContent = "Bulut bağlantı hatası";
+      } catch {
+        setCloudUI("unconfigured", "Bulut bağlantı hatası");
         return false;
       }
     }
 
     async function pushToGitHub() {
-      const cfg = getCloudConfig();
-      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return false;
-
-      const statusLabel = document.getElementById("cloudStatusLabel");
-      statusLabel.textContent = "Buluta kaydediliyor...";
+      if (!hasEmbeddedCloud()) return false;
+      const { owner, repo, path, token } = EMBEDDED_CLOUD_CONFIG;
+      const filePath = path || "progress.json";
+      setCloudUI("syncing", "Buluta kaydediliyor...");
 
       try {
-        const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path}`;
+        const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}`;
 
-        // Güncel SHA yoksa önce mevcut dosyayı kontrol et
         if (!cloudSha) {
           const checkRes = await fetch(`${url}?t=${Date.now()}`, {
             headers: {
-              "Authorization": `Bearer ${cfg.token}`,
+              "Authorization": `Bearer ${token}`,
               "Accept": "application/vnd.github+json"
             }
           });
@@ -650,7 +476,7 @@
         };
 
         const body = {
-          message: `MCU izleme durumu güncellendi (${new Date().toLocaleString("tr-TR")})`,
+          message: `MCU ilerleme güncellendi (${new Date().toLocaleString("tr-TR")})`,
           content: encodeBase64Unicode(JSON.stringify(payloadObj, null, 2))
         };
         if (cloudSha) body.sha = cloudSha;
@@ -658,7 +484,7 @@
         const res = await fetch(url, {
           method: "PUT",
           headers: {
-            "Authorization": `Bearer ${cfg.token}`,
+            "Authorization": `Bearer ${token}`,
             "Accept": "application/vnd.github+json",
             "Content-Type": "application/json"
           },
@@ -666,44 +492,39 @@
         });
 
         if (!res.ok) {
-          // SHA çakışması olduysa sıfırla ve tekrar dene
-          if (res.status === 409) {
-            cloudSha = null;
-          }
-          statusLabel.textContent = "Bulut kayıt hatası";
+          if (res.status === 409) cloudSha = null;
+          setCloudUI("unconfigured", "Buluta yazılamadı");
           return false;
         }
 
         const data = await res.json();
-        cloudSha = data.content && data.content.sha ? data.content.sha : cloudSha;
+        if (data.content && data.content.sha) cloudSha = data.content.sha;
         const nowStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        statusLabel.textContent = `Buluta kaydedildi (${nowStr})`;
+        setCloudUI("ready", `Buluta kaydedildi (${nowStr})`);
         return true;
-      } catch (err) {
-        statusLabel.textContent = "Buluta yazılamadı";
+      } catch {
+        setCloudUI("unconfigured", "Bulut kayıt hatası");
         return false;
       }
     }
 
     function scheduleCloudPush() {
-      const cfg = getCloudConfig();
-      if (!cfg || !cfg.owner || !cfg.repo || !cfg.token) return;
+      if (!hasEmbeddedCloud()) return;
       clearTimeout(syncTimer);
-      syncTimer = setTimeout(() => {
-        pushToGitHub();
-      }, 800);
+      syncTimer = setTimeout(() => { pushToGitHub(); }, 600);
     }
 
     async function manualSyncNow() {
+      if (!hasEmbeddedCloud()) {
+        showToast("Önce kod içindeki EMBEDDED_CLOUD_CONFIG alanına owner, repo ve token girin.");
+        return;
+      }
       const icon = document.getElementById("syncIcon");
       icon.classList.add("animate-spin");
       await pullFromGitHub(false);
       icon.classList.remove("animate-spin");
     }
 
-    // =========================================================================
-    // 4. POSTER OLUŞTURMA VE WIKIPEDIA POSTER GETİRME
-    // =========================================================================
     function createFallbackPosterDataUri(item) {
       const title = item.ad.length > 26 ? item.ad.slice(0, 24) + "…" : item.ad;
       const num = String(item.sira).padStart(2, "0");
@@ -747,9 +568,6 @@
       return null;
     }
 
-    // =========================================================================
-    // 5. EKRAN ÇİZİMİ, İSTATİSTİKLER VE FİLTRELEME
-    // =========================================================================
     function renderApp() {
       updateStatsAndUpNext();
       renderSections();
@@ -774,7 +592,6 @@
       document.getElementById("progressPercentText").textContent = `%${pct}`;
       document.getElementById("mainProgressBar").style.width = `${pct}%`;
 
-      // Sıradaki Yapım (Önce "watching", yoksa ilk "unwatched")
       const nextItem =
         MCU_ITEMS.find(i => getStatus(i.id) === "watching") ||
         MCU_ITEMS.find(i => getStatus(i.id) === "unwatched") ||
@@ -869,7 +686,6 @@
         container.appendChild(sectionEl);
       });
 
-      // Görünür kartların posterlerini arka planda yükle
       visiblePosterHydration(filtered);
     }
 
@@ -883,7 +699,6 @@
       return `
         <div id="item-card-${item.id}" class="${cardClass} rounded-xl border p-3 sm:p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start sm:items-center gap-3.5 min-w-0">
-            <!-- Poster -->
             <div class="relative shrink-0">
               <img id="poster-${item.id}" src="${posterSrc}" alt="${item.ad}" loading="lazy"
                 class="w-12 h-[72px] sm:w-14 sm:h-[84px] rounded-lg object-cover border border-zinc-700/80 bg-zinc-950" />
@@ -892,7 +707,6 @@
               </span>
             </div>
 
-            <!-- Bilgiler -->
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="font-bold text-sm sm:text-base text-white leading-snug ${st === "watched" ? "line-through decoration-emerald-500/60 text-zinc-300" : ""}">
@@ -919,7 +733,6 @@
             </div>
           </div>
 
-          <!-- Durum Seçici -->
           <div class="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/70">
             <select onchange="setStatus(${item.id}, this.value)" aria-label="İzleme durumu"
               class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer focus:outline-none ${getSelectStyle(st)}">
@@ -958,9 +771,6 @@
       });
     }
 
-    // =========================================================================
-    // 6. ETKİLEŞİMLER, YEDEKLEME VE YARDIMCILAR
-    // =========================================================================
     function toggleSection(sagaName) {
       openSections[sagaName] = openSections[sagaName] === false ? true : false;
       renderSections();
